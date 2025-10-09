@@ -127,7 +127,7 @@ import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import { initSocket, disconnectSocket } from "../../lib/socket"; // 👈 import socket utils
 
-const API = "http://10.121.42.9:8000/api/user";
+const API = "http://10.150.225.9:8000/api/user";
 
 // ✅ Helper to save auth data
 const saveAuthData = async (user, token) => {

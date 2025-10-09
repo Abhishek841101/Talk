@@ -36,29 +36,25 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 // slices
 import authReducer from "../features/auth/authSlice";
 import chatReducer from "../features/chat/chatSlice";
-import reelsReducer from "../features/reels/reelsSlice";
-import contestsReducer from "../features/Contests/ContestsSlice";
+// import reelsReducer from "../features/reels/reelsSlice";
+// import contestsReducer from "../features/Contests/ContestsSlice";
 import postsReducer from "../features/posts/postsSlice";
 import profileReducer from "../features/profile/profileSlice";
-import notificationReducer from '../features/notifications/notificationSlice';
-import callReducer from '../features/calls/callSlice';
-import voiceNoteReducer from '../features/calls/voiceNoteSlice';
-import socketReducer from '../features/calls/socketSlice';
+// import notificationReducer from '../features/notifications/notificationSlice';
+// import callReducer from '../features/calls/callSlice';
+// import voiceNoteReducer from '../features/calls/voiceNoteSlice';
+// import socketReducer from '../features/calls/socketSlice';
 
 
 
 const rootReducer = combineReducers({
   auth: authReducer,
   chat: chatReducer,
-  reels: reelsReducer,
-  contests: contestsReducer,
+
   profile: profileReducer,
   post:postsReducer,
-  notifications: notificationReducer,
-    // ✅ ADD NEW REDUCERS
-    call: callReducer,
-    voiceNote: voiceNoteReducer,
-    socket: socketReducer,
+  
+    // socket: socketReducer,
 });
 
 export const store = configureStore({

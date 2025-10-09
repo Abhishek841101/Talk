@@ -45,7 +45,7 @@ export const initSocket = async () => {
     const myId = store.getState().auth.user?._id;
     if (!token || !myId) throw new Error("No auth token or user available");
 
-    socket = io("http://10.121.42.9:8000", {
+    socket = io("http://10.150.225.9:8000", {
       auth: { token },
       transports: ["websocket"],
       reconnectionAttempts: 10,

@@ -57,7 +57,7 @@ export const fetchPosts = createAsyncThunk(
   async (_, thunkAPI) => {
     try {
       const token = thunkAPI.getState().auth.user?.token; // get user token if required
-      const res = await axios.get("http://10.189.33.9:8000/api/posts", {
+      const res = await axios.get("http://10.150.225.9:8000/api/posts", {
         headers: { Authorization: `Bearer ${token}` },
       });
       return res.data; // should be array of posts

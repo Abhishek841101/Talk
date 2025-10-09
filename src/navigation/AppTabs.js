@@ -202,9 +202,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 // Stacks
 import HomeStack from "./HomeStack";
-import ContestsStack from "./ContestsStack";
+
 import ProfileStack from "./ProfileStack";
-import ReelsStack from "./ReelsStack";
+
 // import UploadStack from "./UploadStack";
 
 const Tab = createBottomTabNavigator();
@@ -227,21 +227,8 @@ export default function AppTabs() {
         }}
       />
 
-      <Tab.Screen
-        name="ContestsTab"
-        component={ContestsStack}
-        options={{
-          tabBarIcon: ({ color }) => <Feather name="award" size={24} color={color} />,
-        }}
-      />
+    
 
-      <Tab.Screen
-        name="ReelsTab"
-        component={ReelsStack}
-        options={{
-          tabBarIcon: ({ color }) => <MaterialIcons name="video-library" size={24} color={color} />,
-        }}
-      />
 
       {/* <Tab.Screen
         name="UploadTab"
