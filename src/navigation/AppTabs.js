@@ -204,9 +204,9 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import HomeStack from "./HomeStack";
 
 import ProfileStack from "./ProfileStack";
-
+import UploadScreen from "../screens/posts/UploadScreen";
 // import UploadStack from "./UploadStack";
-
+import ContestsStack from "./ContestsStack";
 const Tab = createBottomTabNavigator();
 
 export default function AppTabs() {
@@ -226,8 +226,27 @@ export default function AppTabs() {
           tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
         }}
       />
-
+ {/* Contests */}
+      <Tab.Screen
+        name="Contests"
+        component={ContestsStack}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Feather name="award" size={24} color={color} />
+          ),
+        }}
+      />
     
+ {/* Upload */}
+      <Tab.Screen
+        name="Upload"
+        component={UploadScreen}
+        options={{
+          tabBarIcon: ({ color }) => (
+            <Ionicons name="cloud-upload-outline" size={26} color={color} />
+          ),
+        }}
+      />
 
 
       {/* <Tab.Screen

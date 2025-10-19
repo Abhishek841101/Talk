@@ -4,7 +4,7 @@ import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API = "http://10.150.225.9:8000/api";
+const API = "http://10.99.136.9:8000/api";
 
 // ================== Helper ==================
 const getAuthHeaders = async () => {
@@ -75,7 +75,8 @@ export const fetchTabData = createAsyncThunk(
     if (!username) return thunkAPI.rejectWithValue("Username is required");
     try {
       const headers = await getAuthHeaders();
-      const url = `${API}/user/${tab}/${username}?cursor=${cursor}`;
+      url = `${API}/post/${username}/posts?cursor=${cursor}`;
+
       const res = await axios.get(url, { headers });
       console.log(`🌐 API response for ${tab}:`, res.data);
 

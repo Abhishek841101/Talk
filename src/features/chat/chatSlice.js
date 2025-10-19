@@ -3,7 +3,7 @@ import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
 import axios from "axios";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-const API = "http://10.150.225.9:8000/api";
+const API = "http://10.99.136.9:8000/api";
 
 // -------------------- Async Thunks --------------------
 

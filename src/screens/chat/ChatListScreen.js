@@ -533,7 +533,7 @@ export default function ChatListScreen() {
   );
 
   return (
-    <View style={{ flex: 1, backgroundColor: "#fff" }}>
+    <View style={{ flex: 1, backgroundColor: "#ffffffff" }}>
       {/* Search Bar */}
       <View style={styles.searchContainer}>
         <Ionicons name="search-outline" size={20} color="#888" />
@@ -576,7 +576,7 @@ export default function ChatListScreen() {
                     <View
                       style={[
                         styles.avatar,
-                        { backgroundColor: "#ddd", justifyContent: "center", alignItems: "center" },
+                        { backgroundColor: "#130303ff", justifyContent: "center", alignItems: "center" },
                       ]}
                     >
                       <Ionicons name={item.isGroup ? "people" : "person"} size={24} color="#666" />
@@ -624,7 +624,7 @@ const styles = StyleSheet.create({
     alignItems: "center",
     margin: 12,
     paddingHorizontal: 12,
-    backgroundColor: "#f0f0f0",
+    backgroundColor: "#881e1eff",
     borderRadius: 20,
     height: 40,
   },
@@ -635,7 +635,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 16,
     borderBottomWidth: 1,
-    borderBottomColor: "#eee",
+    borderBottomColor: "#e7cfcfff",
   },
   avatar: { width: 50, height: 50, borderRadius: 25 },
   onlineDot: {
@@ -647,10 +647,10 @@ const styles = StyleSheet.create({
     bottom: 2,
     right: 2,
     borderWidth: 2,
-    borderColor: "#fff",
+    borderColor: "#b4a8a8ff",
   },
   username: { fontSize: 16 },
-  lastMessage: { color: "#555", fontSize: 13, marginTop: 2 },
+  lastMessage: { color: "#ce0a0aff", fontSize: 13, marginTop: 2 },
   unreadBadge: {
     backgroundColor: "red",
     borderRadius: 12,
