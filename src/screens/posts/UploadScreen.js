@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import {
   View,
@@ -16,19 +17,20 @@ import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
 import { useDispatch, useSelector } from 'react-redux';
 import { uploadPost, setUploadProgress } from '../../features/posts/postsSlice';
 import Ionicons from 'react-native-vector-icons/Ionicons';
+import Video from 'react-native-video';
 
 export default function UploadScreen({ navigation }) {
   const dispatch = useDispatch();
   const { user } = useSelector((state) => state.auth);
 
-  const [image, setImage] = useState(null);
+  const [media, setMedia] = useState(null); // { uri, type }
   const [caption, setCaption] = useState('');
   const [uploading, setUploading] = useState(false);
 
-  // -------------------- Image Picker --------------------
-  const pickImage = async () => {
+  // -------------------- Media Picker --------------------
+  const pickMedia = async () => {
     const options = {
-      mediaType: 'photo',
+      mediaType: 'mixed', // supports image + video
       quality: 0.8,
       selectionLimit: 1,
     };
@@ -39,14 +41,15 @@ export default function UploadScreen({ navigation }) {
         return Alert.alert('Error', response.errorMessage);
       }
       if (response.assets && response.assets.length > 0) {
-        setImage(response.assets[0].uri);
+        const asset = response.assets[0];
+        setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
       }
     });
   };
 
-  const takePhoto = async () => {
+  const takeMedia = async () => {
     const options = {
-      mediaType: 'photo',
+      mediaType: 'mixed',
       quality: 0.8,
       saveToPhotos: true,
     };
@@ -57,29 +60,37 @@ export default function UploadScreen({ navigation }) {
         return Alert.alert('Error', response.errorMessage);
       }
       if (response.assets && response.assets.length > 0) {
-        setImage(response.assets[0].uri);
+        const asset = response.assets[0];
+        setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
       }
     });
   };
 
-  const removeImage = () => setImage(null);
+  const removeMedia = () => setMedia(null);
   const resetForm = () => {
     setCaption('');
-    setImage(null);
+    setMedia(null);
   };
 
   // -------------------- Upload Post --------------------
   const handleUpload = async () => {
-    if (!caption.trim() && !image)
-      return Alert.alert('Error', 'Please add text or select an image');
+    if (!caption.trim() && !media)
+      return Alert.alert('Error', 'Please add text or select an image/video');
+
     setUploading(true);
     dispatch(setUploadProgress(0));
-    try {
-      await dispatch(uploadPost({ image, caption: caption.trim() })).unwrap();
-      Alert.alert('Success', 'Your post has been uploaded!', [
-  { text: 'OK', onPress: () => { resetForm(); navigation.navigate('HomeTab', { screen: 'HomeScreen' }); } },
-]);
 
+    try {
+      await dispatch(uploadPost({ media, caption: caption.trim() })).unwrap();
+      Alert.alert('Success', 'Your post has been uploaded!', [
+        {
+          text: 'OK',
+          onPress: () => {
+            resetForm();
+            navigation.navigate('HomeTab', { screen: 'HomeScreen' });
+          },
+        },
+      ]);
     } catch (err) {
       console.error(err);
       Alert.alert('Upload Failed', err || 'Something went wrong');
@@ -101,12 +112,12 @@ export default function UploadScreen({ navigation }) {
         </TouchableOpacity>
         <TouchableOpacity
           onPress={handleUpload}
-          disabled={(!caption.trim() && !image) || uploading}
+          disabled={(!caption.trim() && !media) || uploading}
         >
           <Text
             style={[
               styles.shareButton,
-              (!caption.trim() && !image) && styles.shareButtonDisabled,
+              (!caption.trim() && !media) && styles.shareButtonDisabled,
             ]}
           >
             Post
@@ -115,11 +126,20 @@ export default function UploadScreen({ navigation }) {
       </View>
 
       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {/* Image preview */}
-        {image && (
-          <View style={styles.imagePreviewContainer}>
-            <Image source={{ uri: image }} style={styles.imagePreview} />
-            <TouchableOpacity style={styles.removeImageButton} onPress={removeImage}>
+        {/* Media preview */}
+        {media && (
+          <View style={styles.mediaPreviewContainer}>
+            {media.type.startsWith('image') ? (
+              <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
+            ) : (
+              <Video
+                source={{ uri: media.uri }}
+                style={styles.mediaPreview}
+                controls
+                resizeMode="cover"
+              />
+            )}
+            <TouchableOpacity style={styles.removeMediaButton} onPress={removeMedia}>
               <Ionicons name="close-circle" size={28} color="#ff4444" />
             </TouchableOpacity>
           </View>
@@ -137,13 +157,13 @@ export default function UploadScreen({ navigation }) {
           />
         </View>
 
-        {/* Image buttons */}
-        <View style={styles.imageButtons}>
-          <TouchableOpacity onPress={pickImage} style={styles.imageButton}>
+        {/* Media buttons */}
+        <View style={styles.mediaButtons}>
+          <TouchableOpacity onPress={pickMedia} style={styles.mediaButton}>
             <Ionicons name="images-outline" size={20} color="#fff" />
             <Text style={styles.buttonText}>Gallery</Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={takePhoto} style={styles.imageButton}>
+          <TouchableOpacity onPress={takeMedia} style={styles.mediaButton}>
             <Ionicons name="camera-outline" size={20} color="#fff" />
             <Text style={styles.buttonText}>Camera</Text>
           </TouchableOpacity>
@@ -178,14 +198,14 @@ const styles = StyleSheet.create({
   content: { padding: 16 },
   inputWrapper: { borderBottomWidth: 0.5, borderColor: '#ddd', paddingBottom: 8 },
   textInput: { fontSize: 16, minHeight: 80, color: '#000' },
-  imagePreviewContainer: {
+  mediaPreviewContainer: {
     position: 'relative',
     marginBottom: 12,
     borderRadius: 12,
     overflow: 'hidden',
   },
-  imagePreview: { width: '100%', height: 250, borderRadius: 12 },
-  removeImageButton: {
+  mediaPreview: { width: '100%', height: 250, borderRadius: 12, backgroundColor: '#000' },
+  removeMediaButton: {
     position: 'absolute',
     top: 8,
     right: 8,
@@ -193,8 +213,8 @@ const styles = StyleSheet.create({
     borderRadius: 15,
     padding: 2,
   },
-  imageButtons: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  imageButton: {
+  mediaButtons: { flexDirection: 'row', gap: 10, marginTop: 12 },
+  mediaButton: {
     flex: 1,
     backgroundColor: '#1DA1F2',
     flexDirection: 'row',
@@ -208,4 +228,3 @@ const styles = StyleSheet.create({
   uploadingContainer: { marginTop: 20, alignItems: 'center' },
   uploadingText: { marginTop: 10, fontSize: 16, color: '#666' },
 });
-

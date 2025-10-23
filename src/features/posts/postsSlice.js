@@ -7,48 +7,58 @@ const API = "http://10.99.136.9:8000/api/post";
 
 // -------------------- Async Thunks --------------------
 
-// Upload post (with image using FormData)
+
 export const uploadPost = createAsyncThunk(
   "posts/uploadPost",
   async (postData, thunkAPI) => {
     try {
       const token = await AsyncStorage.getItem("token");
+      console.log("📌 [uploadPost] Starting upload, token:", token);
 
       const formData = new FormData();
-      formData.append("caption", postData.caption);
+      formData.append("caption", postData.caption || "");
       if (postData.location) formData.append("location", postData.location);
 
-      if (postData.image) {
-        formData.append("image", {
-          uri: postData.image, // local file URI from picker
-          name: "photo.jpg", // any filename
-          type: "image/jpeg", // MIME type
+      if (postData.media) {
+        const { uri, type, name } = postData.media;
+        console.log("📌 [uploadPost] Media info:", { uri, type, name });
+
+        let mimeType = type || "image/jpeg";
+        if (name?.endsWith(".mp4")) mimeType = "video/mp4";
+
+        formData.append("media", {
+          uri,
+          type: mimeType,
+          name: name || `file_${Date.now()}.${mimeType.split("/")[1]}`,
         });
       }
 
-      const res = await axios.post(`${API}/posts`, formData, {
+      console.log("📌 [uploadPost] FormData ready:", formData);
+
+      const res = await fetch(`${API}/posts`, {
+        method: "POST",
         headers: {
           Authorization: `Bearer ${token}`,
-          "Content-Type": "multipart/form-data",
         },
-        onUploadProgress: (progressEvent) => {
-          const percent = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          thunkAPI.dispatch(setUploadProgress(percent));
-        },
+        body: formData,
       });
 
-      return res.data.post;
+      if (!res.ok) {
+        const errData = await res.json();
+        console.log("❌ [uploadPost] Server response:", errData);
+        throw new Error(errData.message || "Failed to upload post");
+      }
+
+      const data = await res.json();
+      console.log("✅ [uploadPost] Upload response:", data);
+
+      return data.post;
     } catch (err) {
-      console.log("❌ Upload error:", err);
-      return thunkAPI.rejectWithValue(
-        err.response?.data?.message || "Failed to upload post"
-      );
+      console.log("❌ [uploadPost] Network/Error caught:", err.message || err);
+      return thunkAPI.rejectWithValue(err.message || "Failed to upload post");
     }
   }
 );
-
 
 
 // Fetch posts (paginated)
@@ -311,3 +321,351 @@ export const {
 } = postsSlice.actions;
 
 export default postsSlice.reducer;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// import { createSlice, createAsyncThunk } from "@reduxjs/toolkit";
+// import axios from "axios";
+// import AsyncStorage from "@react-native-async-storage/async-storage";
+
+// const API = "http://10.99.136.9:8000/api/post";
+
+// // -------------------- Async Thunks --------------------
+
+// // Upload post (image/video)
+// export const uploadPost = createAsyncThunk(
+//   "posts/uploadPost",
+//   async (postData, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log("📤 Uploading post:", postData);
+
+//       const formData = new FormData();
+//       formData.append("caption", postData.caption);
+//       if (postData.location) formData.append("location", postData.location);
+
+//       if (postData.media) {
+//         const { uri, type, name } = postData.media;
+
+//         let mimeType = type;
+//         if (!mimeType) {
+//           if (name?.endsWith(".mp4")) mimeType = "video/mp4";
+//           else if (name?.endsWith(".mkv")) mimeType = "video/mkv";
+//           else if (name?.endsWith(".avi")) mimeType = "video/avi";
+//           else mimeType = "image/jpeg";
+//         }
+
+//         formData.append("file", {
+//           uri,
+//           type: mimeType,
+//           name: name || `file_${Date.now()}.${mimeType.split("/")[1]}`,
+//         });
+//       }
+
+//       const res = await axios.post(`${API}/posts`, formData, {
+//         headers: {
+//           Authorization: `Bearer ${token}`,
+//           "Content-Type": "multipart/form-data",
+//         },
+//         onUploadProgress: (progressEvent) => {
+//           const percent = Math.round((progressEvent.loaded * 100) / progressEvent.total);
+//           thunkAPI.dispatch(setUploadProgress(percent));
+//           console.log(`⏳ Upload progress: ${percent}%`);
+//         },
+//       });
+
+//       console.log("✅ Post uploaded:", res.data.post);
+//       return res.data.post;
+//     } catch (err) {
+//       console.error("❌ Upload error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to upload post"
+//       );
+//     }
+//   }
+// );
+
+// // Fetch posts
+// export const fetchPosts = createAsyncThunk(
+//   "posts/fetchPosts",
+//   async ({ page = 1, limit = 10 }, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log(`📥 Fetching posts - page ${page}`);
+//       const res = await axios.get(`${API}/posts?page=${page}&limit=${limit}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       return {
+//         posts: res.data.posts || [],
+//         hasMore: res.data.hasMore || false,
+//         page,
+//       };
+//     } catch (err) {
+//       console.error("❌ Fetch posts error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to fetch posts"
+//       );
+//     }
+//   }
+// );
+
+// // Delete post
+// export const deletePost = createAsyncThunk(
+//   "posts/deletePost",
+//   async (postId, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log("🗑 Deleting post:", postId);
+//       await axios.delete(`${API}/posts/${postId}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       console.log("✅ Post deleted:", postId);
+//       return postId;
+//     } catch (err) {
+//       console.error("❌ Delete post error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to delete post"
+//       );
+//     }
+//   }
+// );
+
+// // Like/unlike post
+// export const likePost = createAsyncThunk(
+//   "posts/likePost",
+//   async (postId, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log("❤️ Toggling like for post:", postId);
+//       const res = await axios.post(
+//         `${API}/posts/${postId}/like`,
+//         {},
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       console.log("✅ Like updated:", res.data);
+//       return {
+//         postId,
+//         likesCount: res.data.likesCount,
+//         liked: res.data.liked,
+//       };
+//     } catch (err) {
+//       console.error("❌ Like post error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to like post"
+//       );
+//     }
+//   }
+// );
+
+// // Add comment
+// export const addCommentToPost = createAsyncThunk(
+//   "posts/addCommentToPost",
+//   async ({ postId, commentText }, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log(`💬 Adding comment to post ${postId}: ${commentText}`);
+//       const res = await axios.post(
+//         `${API}/posts/${postId}/comment`,
+//         { text: commentText },
+//         { headers: { Authorization: `Bearer ${token}` } }
+//       );
+//       return { postId, comment: res.data.comment };
+//     } catch (err) {
+//       console.error("❌ Add comment error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to add comment"
+//       );
+//     }
+//   }
+// );
+
+// // Delete comment
+// export const deleteCommentFromPost = createAsyncThunk(
+//   "posts/deleteCommentFromPost",
+//   async ({ postId, commentId }, thunkAPI) => {
+//     try {
+//       const token = await AsyncStorage.getItem("token");
+//       console.log(`🗑 Deleting comment ${commentId} from post ${postId}`);
+//       await axios.delete(`${API}/posts/${postId}/comments/${commentId}`, {
+//         headers: { Authorization: `Bearer ${token}` },
+//       });
+//       console.log("✅ Comment deleted:", commentId);
+//       return { postId, commentId };
+//     } catch (err) {
+//       console.error("❌ Delete comment error:", err.response || err.message || err);
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || "Failed to delete comment"
+//       );
+//     }
+//   }
+// );
+
+// // -------------------- Slice --------------------
+// const postsSlice = createSlice({
+//   name: "posts",
+//   initialState: {
+//     posts: [],
+//     loading: false,
+//     error: null,
+//     hasMore: true,
+//     page: 1,
+//     uploadProgress: 0,
+//     currentPost: null,
+//   },
+//   reducers: {
+//     setPostsLoading: (state, action) => { 
+//       console.log("🕐 Setting posts loading:", action.payload);
+//       state.loading = action.payload; 
+//     },
+//     incrementPage: (state) => { state.page += 1; },
+//     addPostOptimistic: (state, action) => {
+//       const newPost = {
+//         id: `temp-${Date.now()}`,
+//         ...action.payload,
+//         createdAt: new Date().toISOString(),
+//         likes: 0,
+//         liked: false,
+//         comments: [],
+//         _temp: true,
+//       };
+//       console.log("✨ Optimistically adding post:", newPost);
+//       state.posts.unshift(newPost);
+//     },
+//     addPostFromSocket: (state, action) => {
+//       const newPost = action.payload;
+//       console.log("📡 Post received from socket:", newPost);
+//       const existingIndex = state.posts.findIndex(
+//         (p) => p.id === newPost.id || (p._temp && p.caption === newPost.caption)
+//       );
+//       if (existingIndex !== -1)
+//         state.posts[existingIndex] = { ...newPost, _temp: false };
+//       else state.posts.unshift(newPost);
+//     },
+//     addCommentOptimistic: (state, action) => {
+//       const { postId, text, username } = action.payload;
+//       const post = state.posts.find((p) => p.id === postId);
+//       if (post) {
+//         const newComment = {
+//           id: `temp-${Date.now()}`,
+//           username,
+//           text,
+//           createdAt: new Date().toISOString(),
+//           _temp: true,
+//         };
+//         console.log("💬 Optimistically adding comment:", newComment);
+//         if (!post.comments) post.comments = [];
+//         post.comments.push(newComment);
+//       }
+//     },
+//     addCommentFromSocket: (state, action) => {
+//       const { postId, comment } = action.payload;
+//       const post = state.posts.find((p) => p.id === postId);
+//       if (!post) return;
+//       post.comments = post.comments?.filter(c => !(c._temp && c.text === comment.text)) || [];
+//       post.comments.push(comment);
+//       console.log("📡 Comment received from socket:", comment);
+//     },
+//     updatePostLikes: (state, action) => {
+//       const { postId, likesCount, liked } = action.payload;
+//       const post = state.posts.find((p) => p.id === postId);
+//       if (!post) return;
+//       post.likes = likesCount;
+//       post.liked = liked;
+//       console.log("❤️ Updated likes:", { postId, likesCount, liked });
+//     },
+//     toggleLikeOptimistic: (state, action) => {
+//       const post = state.posts.find((p) => p.id === action.payload);
+//       if (post) {
+//         post.liked = !post.liked;
+//         post.likes += post.liked ? 1 : -1;
+//         console.log("✨ Optimistically toggled like:", { postId: post.id, liked: post.liked });
+//       }
+//     },
+//     setUploadProgress: (state, action) => { 
+//       state.uploadProgress = action.payload; 
+//       console.log("⏳ Upload progress updated:", action.payload);
+//     },
+//     setCurrentPost: (state, action) => { state.currentPost = action.payload; },
+//     clearPosts: (state) => {
+//       console.log("🗑 Clearing all posts");
+//       state.posts = [];
+//       state.loading = false;
+//       state.error = null;
+//       state.hasMore = true;
+//       state.page = 1;
+//       state.uploadProgress = 0;
+//       state.currentPost = null;
+//     },
+//     resetError: (state) => { state.error = null; },
+//   },
+//   extraReducers: (builder) => {
+//     builder
+//       // Upload post
+//       .addCase(uploadPost.pending, (state) => {
+//         console.log("⏳ Upload post pending");
+//         state.loading = true;
+//         state.error = null;
+//         state.uploadProgress = 0;
+//       })
+//       .addCase(uploadPost.fulfilled, (state, action) => {
+//         console.log("✅ Upload post fulfilled");
+//         state.loading = false;
+//         state.uploadProgress = 100;
+//         const newPost = action.payload;
+//         const existingIndex = state.posts.findIndex((p) => p._temp);
+//         if (existingIndex !== -1) state.posts[existingIndex] = newPost;
+//         else state.posts.unshift(newPost);
+//       })
+//       .addCase(uploadPost.rejected, (state, action) => {
+//         console.error("❌ Upload post rejected:", action.payload);
+//         state.loading = false;
+//         state.error = action.payload;
+//         state.uploadProgress = 0;
+//       })
+
+//       // Fetch posts
+//       .addCase(fetchPosts.pending, (state) => { state.loading = true; state.error = null; })
+//       .addCase(fetchPosts.fulfilled, (state, action) => {
+//         console.log("✅ Fetch posts fulfilled");
+//         state.loading = false;
+//         const { posts, hasMore, page } = action.payload;
+//         if (page === 1) state.posts = posts;
+//         else state.posts.push(...posts);
+//         state.hasMore = hasMore;
+//         state.page = page;
+//       })
+//       .addCase(fetchPosts.rejected, (state, action) => {
+//         console.error("❌ Fetch posts rejected:", action.payload);
+//         state.loading = false;
+//         state.error = action.payload;
+//       });
+//   },
+// });
+
+// export const {
+//   setPostsLoading,
+//   incrementPage,
+//   addPostOptimistic,
+//   addPostFromSocket,
+//   toggleLikeOptimistic,
+//   addCommentOptimistic,
+//   setUploadProgress,
+//   setCurrentPost,
+//   updatePostLikes,
+//   addCommentFromSocket,
+//   clearPosts,
+//   resetError,
+// } = postsSlice.actions;
+
+// export default postsSlice.reducer;
