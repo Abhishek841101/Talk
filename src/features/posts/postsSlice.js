@@ -49,6 +49,8 @@ export const uploadPost = createAsyncThunk(
   }
 );
 
+
+
 // Fetch posts (paginated)
 export const fetchPosts = createAsyncThunk(
   "posts/fetchPosts",

@@ -202,7 +202,7 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 
 // Stacks
 import HomeStack from "./HomeStack";
-
+import ReelsStack from "./ReelsStack";
 import ProfileStack from "./ProfileStack";
 import UploadScreen from "../screens/posts/UploadScreen";
 // import UploadStack from "./UploadStack";
@@ -237,6 +237,13 @@ export default function AppTabs() {
         }}
       />
     
+      <Tab.Screen
+        name="ReelsTab"
+        component={ReelsStack}
+        options={{
+          tabBarIcon: ({ color }) => <MaterialIcons name="video-library" size={24} color={color} />,
+        }}
+      />
  {/* Upload */}
       <Tab.Screen
         name="Upload"

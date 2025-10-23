@@ -5,7 +5,7 @@ import { Platform } from "react-native";
 // src/lib/api.ts
 import { io, Socket } from "socket.io-client";
 
-export const API_BASE = "http://10.189.33.9:8000";
+export const API_BASE = "http://10.99.136.9:8000";
 
 let socket: Socket | null = null;
 

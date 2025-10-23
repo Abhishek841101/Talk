@@ -2,7 +2,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://10.250.88.9:8000/api", // 👈 yaha /user mat lagao
+  baseURL: "http://10.99.136.9:8000/api", // 👈 yaha /user mat lagao
   timeout: 5000,
 });
 

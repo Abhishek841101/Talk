@@ -36,7 +36,7 @@ import { configureStore, combineReducers } from "@reduxjs/toolkit";
 // slices
 import authReducer from "../features/auth/authSlice";
 import chatReducer from "../features/chat/chatSlice";
-// import reelsReducer from "../features/reels/reelsSlice";
+import reelsReducer from "../features/reels/reelsSlice";
 import contestsReducer from "../features/Contests/ContestsSlice";
 import postsReducer from "../features/posts/postsSlice";
 import profileReducer from "../features/profile/profileSlice";
@@ -53,7 +53,7 @@ const rootReducer = combineReducers({
   contests: contestsReducer,
   profile: profileReducer,
   posts: postsReducer,
-  
+  reels: reelsReducer,
     // socket: socketReducer,
 });
 

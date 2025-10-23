@@ -77,8 +77,9 @@ export default function UploadScreen({ navigation }) {
     try {
       await dispatch(uploadPost({ image, caption: caption.trim() })).unwrap();
       Alert.alert('Success', 'Your post has been uploaded!', [
-        { text: 'OK', onPress: () => { resetForm(); navigation.navigate('Home'); } },
-      ]);
+  { text: 'OK', onPress: () => { resetForm(); navigation.navigate('HomeTab', { screen: 'HomeScreen' }); } },
+]);
+
     } catch (err) {
       console.error(err);
       Alert.alert('Upload Failed', err || 'Something went wrong');
@@ -207,3 +208,4 @@ const styles = StyleSheet.create({
   uploadingContainer: { marginTop: 20, alignItems: 'center' },
   uploadingText: { marginTop: 10, fontSize: 16, color: '#666' },
 });
+
