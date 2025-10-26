@@ -1,228 +1,5 @@
 
-
-// import React from 'react';
-// import { View, FlatList, StyleSheet } from 'react-native';
-// import { useSelector } from 'react-redux';
-// import { useNavigation } from '@react-navigation/native';
-// import Header from '../../components/common/Header';
-// // import Stories from '../components/Stories';
-// // import PostCard from '../components/common/PostCard';
-
-// export default function HomeScreen() {
-//   const posts = useSelector((state) => state.posts.posts);
-//   const navigation = useNavigation();
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Header with Chat Icon */}
-//       <Header navigation={navigation} />
-
-//       {/* Stories + Posts */}
-//       {/* <FlatList
-//         data={posts}
-//         keyExtractor={(item) => item.id}
-//         showsVerticalScrollIndicator={false}
-//         ListHeaderComponent={<Stories />}
-//         renderItem={({ item }) => <PostCard post={item} />}
-//       /> */}
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: '#fff' },
-// });
-
-
-
-// import React from 'react';
-// import { View, FlatList, StyleSheet, Text } from 'react-native';
-// import { useSelector } from 'react-redux';
-// import { useNavigation } from '@react-navigation/native';
-// import Header from '../../components/common/Header';
-// import PostCard from '../../components/common/PostCard'; // uncomment if exists
-// import Stories from '../../components/common/Stories'; // uncomment if exists
-
-// export default function HomeScreen() {
-//   const posts = useSelector((state) => state.posts?.posts || []); // <-- safe fallback
-//   const navigation = useNavigation();
-
-//   const renderItem = ({ item }) => <PostCard post={item} />;
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Header */}
-//       <Header navigation={navigation} />
-
-//       {/* FlatList with Stories + Posts */}
-//       {posts.length > 0 ? (
-//         <FlatList
-//           data={posts}
-//           keyExtractor={(item) => item.id}
-//           showsVerticalScrollIndicator={false}
-//           ListHeaderComponent={<Stories />}
-//           renderItem={renderItem}
-//         />
-//       ) : (
-//         <View style={styles.emptyContainer}>
-//           <Text>No posts yet. Start posting!</Text>
-//         </View>
-//       )}
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: '#fff' },
-//   emptyContainer: {
-//     flex: 1,
-//     justifyContent: 'center',
-//     alignItems: 'center',
-//   },
-// });
-
-
-
-
-
-// import React, { useState } from "react";
-// import {
-//   View,
-//   FlatList,
-//   StyleSheet,
-//   TouchableOpacity,
-//   Text,
-//   Image,
-// } from "react-native";
-// import { useNavigation } from "@react-navigation/native";
-// import Ionicons from "react-native-vector-icons/Ionicons";
-// import PostCard from "../../components/PostCard";
-// import profilePic from "../../assets/profile.jpg";
-
-// // Dummy posts
-// const posts = [
-//   {
-//     id: "1",
-//     user: { username: "john_doe", avatar: "https://i.pravatar.cc/150?img=1" },
-//     image: "https://picsum.photos/800/400?random=1",
-//     likes: 120,
-//     liked: false,
-//     caption: "Nature at its best!",
-//     followingOnly: false,
-//   },
-//   {
-//     id: "2",
-//     user: { username: "jane_smith", avatar: "https://i.pravatar.cc/150?img=2" },
-//     image: "https://picsum.photos/800/400?random=2",
-//     likes: 300,
-//     liked: true,
-//     caption: "Amazing sunset!",
-//     followingOnly: true,
-//   },
-//   {
-//     id: "3",
-//     user: { username: "alex_90", avatar: "https://i.pravatar.cc/150?img=3" },
-//     image: "https://picsum.photos/800/400?random=3",
-//     likes: 75,
-//     liked: false,
-//     caption: "Adventure time!",
-//     followingOnly: false,
-//   },
-// ];
-
-// export default function HomeScreen() {
-//   const navigation = useNavigation();
-//   const [activeTab, setActiveTab] = useState("For You");
-
-//   // Filter posts based on active tab
-//   const filteredPosts =
-//     activeTab === "For You"
-//       ? posts.filter((p) => !p.followingOnly)
-//       : posts.filter((p) => p.followingOnly);
-
-//   return (
-//     <View style={styles.container}>
-//       {/* Header */}
-//       <View style={styles.header}>
-//         {/* Profile icon */}
-//         <TouchableOpacity onPress={() => navigation.navigate("ProfileStack")}>
-//           <Image source={profilePic} style={styles.profilePic} />
-//         </TouchableOpacity>
-
-//         {/* App name */}
-//         <Text style={styles.logo}>GTalk</Text>
-
-//         {/* Chat icon */}
-//         <TouchableOpacity onPress={() => navigation.navigate("ChatListScreen")}>
-//           <Ionicons name="chatbubble-outline" size={28} color="#1DA1F2" />
-//         </TouchableOpacity>
-//       </View>
-
-//       {/* Tabs */}
-//       <View style={styles.tabRow}>
-//         {["For You", "Following"].map((tab) => (
-//           <TouchableOpacity
-//             key={tab}
-//             onPress={() => setActiveTab(tab)}
-//             style={styles.tabBtn}
-//           >
-//             <Text
-//               style={[styles.tabText, activeTab === tab && styles.tabTextActive]}
-//             >
-//               {tab}
-//             </Text>
-//             {activeTab === tab && <View style={styles.tabUnderline} />}
-//           </TouchableOpacity>
-//         ))}
-//       </View>
-
-//       {/* Posts feed */}
-//       <FlatList
-//         data={filteredPosts}
-//         keyExtractor={(item) => item.id}
-//         showsVerticalScrollIndicator={false}
-//         renderItem={({ item }) => <PostCard post={item} />}
-//       />
-//     </View>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#000" },
-//   header: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     justifyContent: "space-between",
-//     paddingHorizontal: 15,
-//     paddingVertical: 12,
-//     backgroundColor: "#000",
-//     borderBottomWidth: 1,
-//     borderColor: "#1a1a1a",
-//   },
-//   profilePic: { width: 36, height: 36, borderRadius: 18 },
-//   logo: { fontSize: 20, fontWeight: "bold", color: "#fff" },
-//   tabRow: {
-//     flexDirection: "row",
-//     justifyContent: "space-around",
-//     borderBottomWidth: 1,
-//     borderColor: "#1a1a1a",
-//   },
-//   tabBtn: { alignItems: "center", paddingVertical: 10 },
-//   tabText: { color: "gray", fontSize: 15, fontWeight: "600" },
-//   tabTextActive: { color: "#1DA1F2" },
-//   tabUnderline: {
-//     marginTop: 5,
-//     height: 3,
-//     width: 40,
-//     backgroundColor: "#1DA1F2",
-//     borderRadius: 2,
-//   },
-// });
-
-
-
-
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback, useRef } from "react";
 import {
   View,
   FlatList,
@@ -233,9 +10,9 @@ import {
   RefreshControl,
   ActivityIndicator,
   Alert,
+  Dimensions,
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
-// import { Ionicons } from "@expo/vector-icons";
 import Ionicons from "react-native-vector-icons/Ionicons";
 import { useDispatch, useSelector } from "react-redux";
 import PostCard from "../../components/PostCard";
@@ -247,8 +24,9 @@ import {
   incrementPage,
   setPostsLoading,
   resetPage,
-  setHasMore,
 } from "../../features/posts/postsSlice";
+
+const { width: SCREEN_WIDTH, height: SCREEN_HEIGHT } = Dimensions.get("window");
 
 export default function HomeScreen() {
   const navigation = useNavigation();
@@ -256,9 +34,10 @@ export default function HomeScreen() {
   const { posts, loading, hasMore, page } = useSelector((state) => state.posts);
   const { user } = useSelector((state) => state.auth);
 
-  const [activeTab, setActiveTab] = useState("For You");
+  const [activeTab, setActiveTab] = useState(0); // 0 = For You, 1 = Following
   const [refreshing, setRefreshing] = useState(false);
   const [socketConnected, setSocketConnected] = useState(false);
+  const horizontalRef = useRef(null);
 
   // ------------------- Initialize socket -------------------
   useEffect(() => {
@@ -268,12 +47,10 @@ export default function HomeScreen() {
         if (socket) {
           setSocketConnected(true);
 
-          // Listen for new posts
           socket.on("newPost", (post) => {
             dispatch(addPostFromSocket(post));
           });
 
-          // Listen for likes from others
           socket.on("postLiked", ({ postId, likesCount, liked }) => {
             dispatch(toggleLikeOptimistic({ postId, likesCount, liked }));
           });
@@ -291,7 +68,6 @@ export default function HomeScreen() {
   // ------------------- Fetch posts via Redux thunk -------------------
   const fetchPostsFromRedux = async (pageNum = 1, isInitial = false) => {
     if (isInitial) dispatch(setPostsLoading(true));
-
     try {
       await dispatch(fetchPosts({ page: pageNum, limit: 5 })).unwrap();
     } catch (error) {
@@ -321,20 +97,23 @@ export default function HomeScreen() {
 
   // ------------------- Handle like -------------------
   const handleLike = (postId) => {
-    dispatch(toggleLikeOptimistic({ postId })); // Optimistic update
-
-    // Emit socket like event
+    dispatch(toggleLikeOptimistic({ postId }));
     const socket = getSocket();
-    if (socket) {
-      socket.emit("likePost", { postId, userId: user?._id });
-    }
+    if (socket) socket.emit("likePost", { postId, userId: user?._id });
   };
 
   // ------------------- Filter posts by tab -------------------
-  const filteredPosts =
-    activeTab === "For You"
-      ? posts.filter((p) => !p.followingOnly)
-      : posts.filter((p) => p.followingOnly);
+  const filteredPosts = [
+    posts.filter((p) => !p.followingOnly), // For You
+    posts.filter((p) => p.followingOnly),  // Following
+  ];
+
+  // ------------------- Horizontal scroll -------------------
+  const handleHorizontalScroll = (event) => {
+    const offsetX = event.nativeEvent.contentOffset.x;
+    const newIndex = Math.round(offsetX / SCREEN_WIDTH);
+    if (newIndex !== activeTab) setActiveTab(newIndex);
+  };
 
   // ------------------- List Footer -------------------
   const renderFooter = () =>
@@ -346,30 +125,27 @@ export default function HomeScreen() {
     ) : null;
 
   // ------------------- Empty List -------------------
-  const renderEmpty = () => {
-    if (loading) return null;
-    return (
-      <View style={styles.emptyContainer}>
-        <Text style={styles.emptyText}>No posts yet</Text>
-        <Text style={styles.emptySubtext}>
-          {socketConnected
-            ? "Posts will appear here in real-time"
-            : "Connect to see posts"}
-        </Text>
-        {!socketConnected && (
-          <TouchableOpacity
-            style={styles.retryButton}
-            onPress={async () => {
-              const socket = await initSocket();
-              if (socket) setSocketConnected(true);
-            }}
-          >
-            <Text style={styles.retryButtonText}>Reconnect</Text>
-          </TouchableOpacity>
-        )}
-      </View>
-    );
-  };
+  const renderEmpty = (socketConnected) => (
+    <View style={styles.emptyContainer}>
+      <Text style={styles.emptyText}>No posts yet</Text>
+      <Text style={styles.emptySubtext}>
+        {socketConnected
+          ? "Posts will appear here in real-time"
+          : "Connect to see posts"}
+      </Text>
+      {!socketConnected && (
+        <TouchableOpacity
+          style={styles.retryButton}
+          onPress={async () => {
+            const socket = await initSocket();
+            if (socket) setSocketConnected(true);
+          }}
+        >
+          <Text style={styles.retryButtonText}>Reconnect</Text>
+        </TouchableOpacity>
+      )}
+    </View>
+  );
 
   return (
     <View style={styles.container}>
@@ -385,77 +161,87 @@ export default function HomeScreen() {
             style={styles.profilePic}
           />
         </TouchableOpacity>
-
-        <Text style={styles.logo}>GTalk</Text>
-
+        <Text style={styles.logo}>VTalK</Text>
         <View style={styles.headerRight}>
           <TouchableOpacity onPress={() => navigation.navigate("ChatListScreen")}>
             <Ionicons name="chatbubble-outline" size={28} color="#1DA1F2" />
           </TouchableOpacity>
+ <TouchableOpacity onPress={() => navigation.navigate("NotificationScreen")}
+  style={{ marginLeft: 6 }}>
+      <Ionicons name="notifications-outline" size={28} color="#1DA1F2" />
+      
+    </TouchableOpacity>
+
         </View>
       </View>
 
       {/* Connection Status */}
       {!socketConnected && (
         <View style={styles.connectionBanner}>
-          <Text style={styles.connectionText}>
-            🔄 Connecting to real-time updates...
-          </Text>
+          <Text style={styles.connectionText}>🔄 Connecting to real-time updates...</Text>
         </View>
       )}
 
       {/* Tabs */}
       <View style={styles.tabRow}>
-        {["For You", "Following"].map((tab) => (
+        {["For You", "Following"].map((tab, index) => (
           <TouchableOpacity
             key={tab}
-            onPress={() => setActiveTab(tab)}
+            onPress={() =>
+              horizontalRef.current.scrollToOffset({ offset: index * SCREEN_WIDTH, animated: true })
+            }
             style={styles.tabBtn}
           >
-            <Text style={[styles.tabText, activeTab === tab && styles.tabTextActive]}>
+            <Text style={[styles.tabText, activeTab === index && styles.tabTextActive]}>
               {tab}
             </Text>
-            {activeTab === tab && <View style={styles.tabUnderline} />}
+            {activeTab === index && <View style={styles.tabUnderline} />}
           </TouchableOpacity>
         ))}
       </View>
 
-      {/* Posts feed */}
+      {/* Horizontal Scrollable Feed */}
       <FlatList
-        data={filteredPosts}
-        keyExtractor={(item) => item.id}
-        showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => (
-          <PostCard
-            post={item}
-            onLike={() => handleLike(item.id)}
-            onComment={(postId) =>
-              navigation.navigate("Comments", { postId })
+        ref={horizontalRef}
+        data={[0, 1]}
+        horizontal
+        pagingEnabled
+        showsHorizontalScrollIndicator={false}
+        onScroll={handleHorizontalScroll}
+        scrollEventThrottle={16}
+        keyExtractor={(item) => item.toString()}
+        renderItem={({ item: tabIndex }) => (
+          <FlatList
+            data={filteredPosts[tabIndex]}
+            keyExtractor={(post) => post.id}
+            showsVerticalScrollIndicator={false}
+            style={{ width: SCREEN_WIDTH }}
+            renderItem={({ item }) => (
+              <PostCard
+                post={item}
+                fullScreen={true} // make PostCard occupy full screen
+                onLike={() => handleLike(item.id)}
+                onComment={(postId) => navigation.navigate("Comments", { postId })}
+                  onOpenDetail={(postId) => navigation.navigate("PostDetailScreen", { postId })}
+              />
+            )}
+            refreshControl={
+              <RefreshControl
+                refreshing={refreshing}
+                onRefresh={onRefresh}
+                colors={["#1DA1F2"]}
+                tintColor="#1DA1F2"
+              />
             }
+            onEndReached={loadMore}
+            onEndReachedThreshold={0.5}
+            ListFooterComponent={renderFooter}
+            ListEmptyComponent={renderEmpty(socketConnected)}
+            contentContainerStyle={filteredPosts[tabIndex].length === 0 ? styles.emptyList : null}
           />
         )}
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={onRefresh}
-            colors={["#1DA1F2"]}
-            tintColor="#1DA1F2"
-          />
-        }
-        onEndReached={loadMore}
-        onEndReachedThreshold={0.5}
-        ListFooterComponent={renderFooter}
-        ListEmptyComponent={renderEmpty}
-        contentContainerStyle={filteredPosts.length === 0 ? styles.emptyList : null}
       />
 
-      {/* Debug Info */}
-      <View style={styles.debugInfo}>
-        <Text style={styles.debugText}>
-          Posts: {filteredPosts.length} | Socket:{" "}
-          {socketConnected ? "✅" : "❌"} | Tab: {activeTab} | Page: {page}
-        </Text>
-      </View>
     </View>
   );
 }
@@ -471,17 +257,24 @@ const styles = StyleSheet.create({
     backgroundColor: "#000",
     borderBottomWidth: 1,
     borderColor: "#1a1a1a",
-    paddingTop: 30,
+    paddingTop: 40,
   },
   profilePic: { width: 36, height: 36, borderRadius: 18 },
   logo: { fontSize: 20, fontWeight: "bold", color: "#fff" },
   headerRight: { flexDirection: "row", alignItems: "center" },
   connectionBanner: { backgroundColor: "#FFA500", padding: 8, alignItems: "center" },
   connectionText: { color: "#000", fontSize: 12, fontWeight: "600" },
-  tabRow: { flexDirection: "row", justifyContent: "space-around", borderBottomWidth: 1, borderColor: "#1a1a1a" },
-  tabBtn: { alignItems: "center", paddingVertical: 10 },
-  tabText: { color: "gray", fontSize: 15, fontWeight: "600" },
-  tabTextActive: { color: "#1DA1F2" },
+  tabRow: {
+    flexDirection: "row",
+    justifyContent: "space-around",
+    borderBottomWidth: 1,
+    borderColor: "#1a1a1a",
+    backgroundColor: "#000",
+    paddingVertical: 10,
+  },
+  tabBtn: { alignItems: "center" },
+  tabText: { color: "gray", fontSize: 16, fontWeight: "600" },
+  tabTextActive: { color: "#1DA1F2", fontWeight: "bold" },
   tabUnderline: { marginTop: 5, height: 3, width: 40, backgroundColor: "#1DA1F2", borderRadius: 2 },
   footerLoader: { padding: 20, alignItems: "center", flexDirection: "row", justifyContent: "center" },
   loadingText: { color: "#1DA1F2", marginLeft: 10, fontSize: 14 },
@@ -491,6 +284,4 @@ const styles = StyleSheet.create({
   retryButton: { backgroundColor: "#1DA1F2", paddingHorizontal: 20, paddingVertical: 10, borderRadius: 8 },
   retryButtonText: { color: "#fff", fontWeight: "600" },
   emptyList: { flexGrow: 1 },
-  debugInfo: { padding: 5, backgroundColor: "#1a1a1a" },
-  debugText: { color: "#666", fontSize: 10, textAlign: "center" },
 });

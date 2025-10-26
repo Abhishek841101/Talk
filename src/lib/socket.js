@@ -602,3 +602,18 @@ export const disconnectSocket = () => {
 export const isSocketConnected = () => {
   return !!(socket && socket.connected);
 };
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

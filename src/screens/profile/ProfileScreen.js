@@ -179,11 +179,18 @@ export default function ProfileScreen({ route, navigation }) {
           )}
         </View>
         <View style={styles.row}>
-          <Pressable
+          {/* <Pressable
             onPress={() => Alert.alert("Options", "More options coming soon...")}
           >
             <Text style={{ color: C.text.primary, fontSize: 25 }}>⋯</Text>
-          </Pressable>
+          </Pressable> */}
+          <Pressable
+  onPress={() => navigation.navigate("ProfileSettings")}
+  style={{ padding: 6 }}
+>
+  <Text style={{ color: C.text.primary, fontSize: 28 }}>☰</Text> {/* menu icon */}
+</Pressable>
+
         </View>
       </View>
 

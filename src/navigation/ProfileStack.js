@@ -5,6 +5,7 @@ import { createNativeStackNavigator } from "@react-navigation/native-stack";
 import ProfileScreen from "../screens/profile/ProfileScreen";
 import EditProfileScreen from "../screens/profile/EditProfileScreen";
 import FollowersModal from "../screens/profile/FollowesModal";
+import ProfileSettingsScreen from "../screens/profile/ProfileSettingsScreen";
 // import FollowersScreen from "../screens/FollowersScreen";
 // import FollowingScreen from "../screens/FollowingScreen";
 // import FollowersModal from "../screens/FollowesModal";
@@ -19,6 +20,11 @@ export default function ProfileStack() {
         headerShown: false, // agar chahiye toh false rakho
       }}
     >
+      <Stack.Screen
+  name="ProfileSettings"
+  component={ProfileSettingsScreen}
+  options={{ headerTitle: "Settings" }}
+/>
       <Stack.Screen name="Profile" component={ProfileScreen} />
       <Stack.Screen name="EditProfile" component={EditProfileScreen} />
       {/* <Stack.Screen name="Followers" component={FollowersScreen} /> */}

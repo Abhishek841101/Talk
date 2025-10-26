@@ -40,7 +40,7 @@ import reelsReducer from "../features/reels/reelsSlice";
 import contestsReducer from "../features/Contests/ContestsSlice";
 import postsReducer from "../features/posts/postsSlice";
 import profileReducer from "../features/profile/profileSlice";
-// import notificationReducer from '../features/notifications/notificationSlice';
+import notificationReducer from '../features/notifications/notificationSlice';
 // import callReducer from '../features/calls/callSlice';
 // import voiceNoteReducer from '../features/calls/voiceNoteSlice';
 // import socketReducer from '../features/calls/socketSlice';
@@ -54,6 +54,7 @@ const rootReducer = combineReducers({
   profile: profileReducer,
   posts: postsReducer,
   reels: reelsReducer,
+  notification: notificationReducer,
     // socket: socketReducer,
 });
 

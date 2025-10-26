@@ -67,6 +67,9 @@ import ChatScreen from '../screens/chat/ChatScreen';
 // import VideoCallScreen from '../screens/call/VideoCallScreen';
 import UserListScreen from '../screens/chat/UserListScreen';
 import CreateGroupScreen from '../screens/chat/CreateGroupScreen';
+import NotificationScreen from '../screens/notification/NotificationScreen';
+import PostDetailScreen from '../screens/posts/PostDetailScreen';
+
 // import StoryViewerScreen from '../screens/StoryViewerScreen';
 const Stack = createNativeStackNavigator();
 
@@ -76,6 +79,8 @@ export default function HomeStack() {
       <Stack.Screen name="HomeScreen" component={HomeScreen} />
       <Stack.Screen name="ChatListScreen" component={ChatListScreen} />
       <Stack.Screen name="ChatScreen" component={ChatScreen} />
+      <Stack.Screen name="NotificationScreen" component={NotificationScreen} />
+      <Stack.Screen name="PostDetailScreen" component={PostDetailScreen} />
       {/* <Stack.Screen name="VoiceCallScreen" component={VoiceCallScreen} /> */}
       {/* <Stack.Screen name="VideoCallScreen" component={VideoCallScreen} /> */}
       <Stack.Screen name="UserListScreen" component={UserListScreen} />

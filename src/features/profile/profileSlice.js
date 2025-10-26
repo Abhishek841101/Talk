@@ -69,34 +69,66 @@ export const fetchProfile = createAsyncThunk(
 );
 
 // ✅ Fetch tab data (posts/reels/tagged)
+// export const fetchTabData = createAsyncThunk(
+//   "profile/fetchTabData",
+//   async ({ tab, cursor = 0, username }, thunkAPI) => {
+//     if (!username) return thunkAPI.rejectWithValue("Username is required");
+//     try {
+//       const headers = await getAuthHeaders();
+//       url = `${API}/post/${username}/posts?cursor=${cursor}`;
+
+//       const res = await axios.get(url, { headers });
+//       console.log(`🌐 API response for ${tab}:`, res.data);
+
+//       return {
+//         tab,
+//         items: res.data.items || [],
+//         nextCursor: res.data.nextCursor || 0,
+//         hasMore: res.data.hasMore || false,
+//       };
+//     } catch (err) {
+//       console.error(
+//         `❌ Error fetching ${tab}:`,
+//         err.response?.data || err.message
+//       );
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || err.message
+//       );
+//     }
+//   }
+// );
+
 export const fetchTabData = createAsyncThunk(
   "profile/fetchTabData",
   async ({ tab, cursor = 0, username }, thunkAPI) => {
     if (!username) return thunkAPI.rejectWithValue("Username is required");
     try {
       const headers = await getAuthHeaders();
-      url = `${API}/post/${username}/posts?cursor=${cursor}`;
 
+      // 1️⃣ Get userId from username
+      const userRes = await axios.get(`${API}/user/profile/${username}`, { headers });
+      const userId = userRes.data?._id || userRes.data?.user?._id;
+      if (!userId) throw new Error("User not found");
+
+      // 2️⃣ Fetch posts using userId
+      const url = `${API}/post/posts/user/${userId}?cursor=${cursor}`;
       const res = await axios.get(url, { headers });
-      console.log(`🌐 API response for ${tab}:`, res.data);
 
       return {
         tab,
-        items: res.data.items || [],
+        items: res.data.items || res.data.posts || [],
         nextCursor: res.data.nextCursor || 0,
-        hasMore: res.data.hasMore || false,
+        hasMore: res.data.hasMore ?? false,
       };
     } catch (err) {
-      console.error(
-        `❌ Error fetching ${tab}:`,
-        err.response?.data || err.message
-      );
       return thunkAPI.rejectWithValue(
         err.response?.data?.message || err.message
       );
     }
   }
 );
+
+
 
 // ✅ Follow / Unfollow
 export const followOrUnfollow = createAsyncThunk(
