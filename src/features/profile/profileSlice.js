@@ -98,25 +98,66 @@ export const fetchProfile = createAsyncThunk(
 //   }
 // );
 
+// export const fetchTabData = createAsyncThunk(
+//   "profile/fetchTabData",
+//   async ({ tab, cursor = 0, username }, thunkAPI) => {
+//     if (!username) return thunkAPI.rejectWithValue("Username is required");
+//     try {
+//       const headers = await getAuthHeaders();
+
+//       // 1️⃣ Get userId from username
+//       const userRes = await axios.get(`${API}/user/profile/${username}`, { headers });
+//       const userId = userRes.data?._id || userRes.data?.user?._id;
+//       if (!userId) throw new Error("User not found");
+
+//       // 2️⃣ Fetch posts using userId
+//       const url = `${API}/post/posts/user/${userId}?cursor=${cursor}`;
+//       const res = await axios.get(url, { headers });
+
+//       return {
+//         tab,
+//         items: res.data.items || res.data.posts || [],
+//         nextCursor: res.data.nextCursor || 0,
+//         hasMore: res.data.hasMore ?? false,
+//       };
+//     } catch (err) {
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || err.message
+//       );
+//     }
+//   }
+// );
 export const fetchTabData = createAsyncThunk(
   "profile/fetchTabData",
-  async ({ tab, cursor = 0, username }, thunkAPI) => {
-    if (!username) return thunkAPI.rejectWithValue("Username is required");
+  async ({ tab, cursor = 0, userId }, thunkAPI) => {
+    if (!userId) return thunkAPI.rejectWithValue("UserId is required");
     try {
       const headers = await getAuthHeaders();
 
-      // 1️⃣ Get userId from username
-      const userRes = await axios.get(`${API}/user/profile/${username}`, { headers });
-      const userId = userRes.data?._id || userRes.data?.user?._id;
-      if (!userId) throw new Error("User not found");
+      let url = "";
 
-      // 2️⃣ Fetch posts using userId
-      const url = `${API}/post/posts/user/${userId}?cursor=${cursor}`;
+      switch (tab) {
+        case "posts":
+          url = `${API}/post/user/${userId}?cursor=${cursor}`;
+          break;
+        case "reels":
+          url = `${API}/reels/user/${userId}?cursor=${cursor}`;
+          break;
+        case "saved":
+          url = `${API}/saved/user/${userId}?cursor=${cursor}`;
+          break;
+        case "tagged":
+          url = `${API}/tagged/user/${userId}?cursor=${cursor}`;
+          break;
+        default:
+          throw new Error("Invalid tab selected");
+      }
+
       const res = await axios.get(url, { headers });
 
       return {
         tab,
-        items: res.data.items || res.data.posts || [],
+        items: res.data.items || [],
         nextCursor: res.data.nextCursor || 0,
         hasMore: res.data.hasMore ?? false,
       };
@@ -127,6 +168,33 @@ export const fetchTabData = createAsyncThunk(
     }
   }
 );
+
+
+
+
+// export const fetchTabData = createAsyncThunk(
+//   "profile/fetchTabData",
+//   async ({ tab, cursor = 0 }, thunkAPI) => {
+//     try {
+//       const headers = await getAuthHeaders();
+
+//       // ✅ Call backend: GET my posts
+//       const url = `${API}/post/posts/me?cursor=${cursor}`;
+//       const res = await axios.get(url, { headers });
+
+//       return {
+//         tab,
+//         items: res.data.posts || [],
+//         nextCursor: res.data.nextCursor || 0,
+//         hasMore: res.data.hasMore ?? false,
+//       };
+//     } catch (err) {
+//       return thunkAPI.rejectWithValue(
+//         err.response?.data?.message || err.message
+//       );
+//     }
+//   }
+// );
 
 
 

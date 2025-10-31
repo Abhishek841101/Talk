@@ -204,9 +204,10 @@ import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import HomeStack from "./HomeStack";
 import ReelsStack from "./ReelsStack";
 import ProfileStack from "./ProfileStack";
-import UploadScreen from "../screens/posts/UploadScreen";
-// import UploadStack from "./UploadStack";
-import ContestsStack from "./ContestsStack";
+// import UploadScreen from "../screens/posts/UploadScreen";
+import LiveStack from "./LiveStack";
+import UploadStack from "./UploadStack";
+// import ContestsStack from "./ContestsStack";
 const Tab = createBottomTabNavigator();
 
 export default function AppTabs() {
@@ -226,16 +227,16 @@ export default function AppTabs() {
           tabBarIcon: ({ color }) => <Ionicons name="home-outline" size={24} color={color} />,
         }}
       />
- {/* Contests */}
-      <Tab.Screen
-        name="Contests"
-        component={ContestsStack}
-        options={{
-          tabBarIcon: ({ color }) => (
-            <Feather name="award" size={24} color={color} />
-          ),
-        }}
-      />
+ {/* Contests
+      // <Tab.Screen
+      //   name="Contests"
+      //   component={ContestsStack}
+      //   options={{
+      //     tabBarIcon: ({ color }) => (
+      //       <Feather name="award" size={24} color={color} />
+      //     ),
+      //   }}
+      // /> */}
     
       <Tab.Screen
         name="ReelsTab"
@@ -244,25 +245,34 @@ export default function AppTabs() {
           tabBarIcon: ({ color }) => <MaterialIcons name="video-library" size={24} color={color} />,
         }}
       />
- {/* Upload */}
+ {/* Upload
+      // <Tab.Screen
+      //   name="Upload"
+      //   component={UploadScreen}
+      //   options={{
+      //     tabBarIcon: ({ color }) => (
+      //       <Ionicons name="cloud-upload-outline" size={26} color={color} />
+      //     ),
+      //   }}
+      /> */}
+
       <Tab.Screen
-        name="Upload"
-        component={UploadScreen}
+        name="LiveTab"
+        component={LiveStack}
         options={{
           tabBarIcon: ({ color }) => (
-            <Ionicons name="cloud-upload-outline" size={26} color={color} />
+            <Ionicons name="radio-outline" size={26} color={color} />
           ),
         }}
       />
 
-
-      {/* <Tab.Screen
+      <Tab.Screen
         name="UploadTab"
         component={UploadStack}
         options={{
           tabBarIcon: ({ color }) => <Ionicons name="cloud-upload-outline" size={26} color={color} />,
         }}
-      /> */}
+      />
 
       <Tab.Screen
         name="ProfileTab"

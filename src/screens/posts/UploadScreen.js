@@ -1,473 +1,235 @@
-
-// import React, { useState } from 'react';
-// import {
-//   View,
-//   Text,
-//   Image,
-//   TextInput,
-//   TouchableOpacity,
-//   StyleSheet,
-//   Alert,
-//   ActivityIndicator,
-//   KeyboardAvoidingView,
-//   Platform,
-//   ScrollView,
-// } from 'react-native';
-// import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-// import { useDispatch, useSelector } from 'react-redux';
-// import { uploadPost, setUploadProgress } from '../../features/posts/postsSlice';
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import Video from 'react-native-video';
-
-// export default function UploadScreen({ navigation }) {
-//   const dispatch = useDispatch();
-//   const { user } = useSelector((state) => state.auth);
-
-//   const [media, setMedia] = useState(null); // { uri, type }
-//   const [caption, setCaption] = useState('');
-//   const [uploading, setUploading] = useState(false);
-
-//   // -------------------- Media Picker --------------------
-//   const pickMedia = async () => {
-//     const options = {
-//       mediaType: 'mixed', // supports image + video
-//       quality: 0.8,
-//       selectionLimit: 1,
-//     };
-//     launchImageLibrary(options, (response) => {
-//       if (response.didCancel) return;
-//       if (response.errorCode) {
-//         console.error('ImagePicker Error:', response.errorMessage);
-//         return Alert.alert('Error', response.errorMessage);
-//       }
-//       if (response.assets && response.assets.length > 0) {
-//         const asset = response.assets[0];
-//         setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
-//       }
-//     });
-//   };
-
-//   const takeMedia = async () => {
-//     const options = {
-//       mediaType: 'mixed',
-//       quality: 0.8,
-//       saveToPhotos: true,
-//     };
-//     launchCamera(options, (response) => {
-//       if (response.didCancel) return;
-//       if (response.errorCode) {
-//         console.error('Camera Error:', response.errorMessage);
-//         return Alert.alert('Error', response.errorMessage);
-//       }
-//       if (response.assets && response.assets.length > 0) {
-//         const asset = response.assets[0];
-//         setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
-//       }
-//     });
-//   };
-
-//   const removeMedia = () => setMedia(null);
-//   const resetForm = () => {
-//     setCaption('');
-//     setMedia(null);
-//   };
-
-//   // -------------------- Upload Post --------------------
-//   const handleUpload = async () => {
-//     if (!caption.trim() && !media)
-//       return Alert.alert('Error', 'Please add text or select an image/video');
-
-//     setUploading(true);
-//     dispatch(setUploadProgress(0));
-
-//     try {
-//       await dispatch(uploadPost({ media, caption: caption.trim() })).unwrap();
-//       Alert.alert('Success', 'Your post has been uploaded!', [
-//         {
-//           text: 'OK',
-//           onPress: () => {
-//             resetForm();
-//             navigation.navigate('HomeTab', { screen: 'HomeScreen' });
-//           },
-//         },
-//       ]);
-//     } catch (err) {
-//       console.error(err);
-//       Alert.alert('Upload Failed', err || 'Something went wrong');
-//     } finally {
-//       setUploading(false);
-//       dispatch(setUploadProgress(0));
-//     }
-//   };
-
-//   return (
-//     <KeyboardAvoidingView
-//       style={styles.container}
-//       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-//     >
-//       {/* Header */}
-//       <View style={styles.header}>
-//         <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-//           <Ionicons name="close" size={28} color="#000" />
-//         </TouchableOpacity>
-//         <TouchableOpacity
-//           onPress={handleUpload}
-//           disabled={(!caption.trim() && !media) || uploading}
-//         >
-//           <Text
-//             style={[
-//               styles.shareButton,
-//               (!caption.trim() && !media) && styles.shareButtonDisabled,
-//             ]}
-//           >
-//             Post
-//           </Text>
-//         </TouchableOpacity>
-//       </View>
-
-//       <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-//         {/* Media preview */}
-//         {media && (
-//           <View style={styles.mediaPreviewContainer}>
-//             {media.type.startsWith('image') ? (
-//               <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
-//             ) : (
-//               <Video
-//                 source={{ uri: media.uri }}
-//                 style={styles.mediaPreview}
-//                 controls
-//                 resizeMode="cover"
-//               />
-//             )}
-//             <TouchableOpacity style={styles.removeMediaButton} onPress={removeMedia}>
-//               <Ionicons name="close-circle" size={28} color="#ff4444" />
-//             </TouchableOpacity>
-//           </View>
-//         )}
-
-//         {/* Text input */}
-//         <View style={styles.inputWrapper}>
-//           <TextInput
-//             style={styles.textInput}
-//             placeholder="What's happening?"
-//             placeholderTextColor="#999"
-//             multiline
-//             value={caption}
-//             onChangeText={setCaption}
-//           />
-//         </View>
-
-//         {/* Media buttons */}
-//         <View style={styles.mediaButtons}>
-//           <TouchableOpacity onPress={pickMedia} style={styles.mediaButton}>
-//             <Ionicons name="images-outline" size={20} color="#fff" />
-//             <Text style={styles.buttonText}>Gallery</Text>
-//           </TouchableOpacity>
-//           <TouchableOpacity onPress={takeMedia} style={styles.mediaButton}>
-//             <Ionicons name="camera-outline" size={20} color="#fff" />
-//             <Text style={styles.buttonText}>Camera</Text>
-//           </TouchableOpacity>
-//         </View>
-
-//         {uploading && (
-//           <View style={styles.uploadingContainer}>
-//             <ActivityIndicator size="large" color="#1DA1F2" />
-//             <Text style={styles.uploadingText}>Posting...</Text>
-//           </View>
-//         )}
-//       </ScrollView>
-//     </KeyboardAvoidingView>
-//   );
-// }
-
-// // -------------------- Styles --------------------
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: '#fff' },
-//   header: {
-//     flexDirection: 'row',
-//     justifyContent: 'space-between',
-//     alignItems: 'center',
-//     padding: 12,
-//     borderBottomWidth: 0.5,
-//     borderColor: '#ddd',
-//     paddingTop: Platform.OS === 'ios' ? 50 : 30,
-//   },
-//   backButton: { padding: 5 },
-//   shareButton: { fontSize: 16, fontWeight: 'bold', color: '#1DA1F2' },
-//   shareButtonDisabled: { color: '#ccc' },
-//   content: { padding: 16 },
-//   inputWrapper: { borderBottomWidth: 0.5, borderColor: '#ddd', paddingBottom: 8 },
-//   textInput: { fontSize: 16, minHeight: 80, color: '#000' },
-//   mediaPreviewContainer: {
-//     position: 'relative',
-//     marginBottom: 12,
-//     borderRadius: 12,
-//     overflow: 'hidden',
-//   },
-//   mediaPreview: { width: '100%', height: 250, borderRadius: 12, backgroundColor: '#000' },
-//   removeMediaButton: {
-//     position: 'absolute',
-//     top: 8,
-//     right: 8,
-//     backgroundColor: 'rgba(255,255,255,0.8)',
-//     borderRadius: 15,
-//     padding: 2,
-//   },
-//   mediaButtons: { flexDirection: 'row', gap: 10, marginTop: 12 },
-//   mediaButton: {
-//     flex: 1,
-//     backgroundColor: '#1DA1F2',
-//     flexDirection: 'row',
-//     alignItems: 'center',
-//     justifyContent: 'center',
-//     gap: 8,
-//     padding: 12,
-//     borderRadius: 10,
-//   },
-//   buttonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
-//   uploadingContainer: { marginTop: 20, alignItems: 'center' },
-//   uploadingText: { marginTop: 10, fontSize: 16, color: '#666' },
-// });
-
-
-
-
-
-
-
-import React, { useState } from 'react';
+import React from "react";
 import {
   View,
   Text,
-  Image,
-  TextInput,
-  TouchableOpacity,
   StyleSheet,
-  Alert,
-  ActivityIndicator,
-  KeyboardAvoidingView,
-  Platform,
+  TouchableOpacity,
   ScrollView,
-} from 'react-native';
-import { launchCamera, launchImageLibrary } from 'react-native-image-picker';
-import { useDispatch, useSelector } from 'react-redux';
-import { uploadPost, setUploadProgress } from '../../features/posts/postsSlice';
-import Ionicons from 'react-native-vector-icons/Ionicons';
-import Video from 'react-native-video';
+  Image,
+  Platform,
+} from "react-native";
+import Ionicons from "react-native-vector-icons/Ionicons";
 
-export default function UploadScreen({ navigation }) {
-  const dispatch = useDispatch();
-  const { user } = useSelector((state) => state.auth);
-
-  const [media, setMedia] = useState(null); // { uri, type, name }
-  const [caption, setCaption] = useState('');
-  const [uploading, setUploading] = useState(false);
-
-  // -------------------- Media Picker --------------------
-  const pickMedia = async () => {
-    const options = {
-      mediaType: 'mixed',
-      quality: 0.8,
-      selectionLimit: 1,
-    };
-    launchImageLibrary(options, (response) => {
-      if (response.didCancel) return;
-      if (response.errorCode) {
-        console.error('ImagePicker Error:', response.errorMessage);
-        return Alert.alert('Error', response.errorMessage);
-      }
-      if (response.assets && response.assets.length > 0) {
-        const asset = response.assets[0];
-        setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
-      }
-    });
-  };
-
-  const takeMedia = async () => {
-    const options = {
-      mediaType: 'mixed',
-      quality: 0.8,
-      saveToPhotos: true,
-    };
-    launchCamera(options, (response) => {
-      if (response.didCancel) return;
-      if (response.errorCode) {
-        console.error('Camera Error:', response.errorMessage);
-        return Alert.alert('Error', response.errorMessage);
-      }
-      if (response.assets && response.assets.length > 0) {
-        const asset = response.assets[0];
-        setMedia({ uri: asset.uri, type: asset.type, name: asset.fileName });
-      }
-    });
-  };
-
-  const removeMedia = () => setMedia(null);
-  const resetForm = () => {
-    setCaption('');
-    setMedia(null);
-  };
-
-  // -------------------- Upload Post --------------------
-  const handleUpload = async () => {
-    if (!caption.trim() && !media) {
-      return Alert.alert('Error', 'Please add text or select an image/video');
-    }
-
-    setUploading(true);
-    dispatch(setUploadProgress(0));
-
-    try {
-      const postData = {};
-      if (caption.trim()) postData.caption = caption.trim();
-      if (media) postData.media = media;
-
-      await dispatch(uploadPost(postData)).unwrap();
-
-      Alert.alert('Success', 'Your post has been uploaded!', [
-        {
-          text: 'OK',
-          onPress: () => {
-            resetForm();
-            navigation.navigate('HomeTab', { screen: 'HomeScreen' });
-          },
-        },
-      ]);
-    } catch (err) {
-      console.error(err);
-      Alert.alert('Upload Failed', err || 'Something went wrong');
-    } finally {
-      setUploading(false);
-      dispatch(setUploadProgress(0));
-    }
-  };
-
+export default function CreateScreen({ navigation }) {
   return (
-    <KeyboardAvoidingView
-      style={styles.container}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <View style={styles.container}>
       {/* Header */}
       <View style={styles.header}>
-        <TouchableOpacity onPress={() => navigation.goBack()} style={styles.backButton}>
-          <Ionicons name="close" size={28} color="#000" />
+        <TouchableOpacity onPress={() => navigation.goBack()}>
+          <Ionicons name="chevron-back" size={26} color="#fff" />
         </TouchableOpacity>
-        <TouchableOpacity
-          onPress={handleUpload}
-          disabled={(!caption.trim() && !media) || uploading}
-        >
-          <Text
-            style={[
-              styles.shareButton,
-              (!caption.trim() && !media) && styles.shareButtonDisabled,
-            ]}
-          >
-            Post
-          </Text>
-        </TouchableOpacity>
+        <Text style={styles.headerTitle}>Create</Text>
+        <View style={{ width: 26 }} />
       </View>
 
-      <ScrollView contentContainerStyle={styles.content} keyboardShouldPersistTaps="handled">
-        {/* Media preview */}
-        {media && (
-          <View style={styles.mediaPreviewContainer}>
-            {media.type.startsWith('image') ? (
-              <Image source={{ uri: media.uri }} style={styles.mediaPreview} />
-            ) : (
-              <Video
-                source={{ uri: media.uri }}
-                style={styles.mediaPreview}
-                controls
-                resizeMode="cover"
-              />
-            )}
-            <TouchableOpacity style={styles.removeMediaButton} onPress={removeMedia}>
-              <Ionicons name="close-circle" size={28} color="#ff4444" />
-            </TouchableOpacity>
-          </View>
-        )}
+      <ScrollView contentContainerStyle={{ paddingTop: 80, paddingBottom: 50 }}>
+        {/* ============== TOP ROW ============== */}
+        <View style={styles.row}>
+          {/* REEL SHORT */}
+          <TouchableOpacity
+            style={styles.block}
+            onPress={() => navigation.navigate("UploadReel")}
+          >
+            <View style={styles.iconBox}>
+              <Ionicons name="videocam-outline" size={30} color="#A45CFF" />
+            </View>
+            <Text style={styles.mainTitle}>Reel</Text>
+            {/* <Text style={styles.subTitle}>Short</Text> */}
 
-        {/* Text input */}
-        <View style={styles.inputWrapper}>
-          <TextInput
-            style={styles.textInput}
-            placeholder="What's happening?"
-            placeholderTextColor="#999"
-            multiline
-            value={caption}
-            onChangeText={setCaption}
+            <View style={styles.smallBtn}>
+              <Text style={styles.smallBtnText}>Record Short Video</Text>
+            </View>
+          </TouchableOpacity>
+
+          {/* POST */}
+          <TouchableOpacity
+            style={styles.block}
+            onPress={() => navigation.navigate("PostCreateScreen")}
+          >
+            <View style={styles.iconBox}>
+              <Ionicons name="image-outline" size={30} color="#7DB9FF" />
+            </View>
+            <Text style={styles.mainTitle}>Post</Text>
+            {/* <Text style={styles.subTitle}>Upload</Text> */}
+
+            <View style={styles.smallBtn}>
+              <Text style={styles.smallBtnText}>Upload & Edit</Text>
+            </View>
+          </TouchableOpacity>
+        </View>
+
+        {/* ============== PODCAST ROW ============== */}
+        <View style={styles.row}>
+          {renderDisabled("Podcast", "Upload Audio/Video", "mic-outline")}
+          {renderDisabled("Record & Upload", "Record + Edit", "recording-outline")}
+        </View>
+
+        {/* ============== GO LIVE / LONG VIDEO ============== */}
+        <View style={styles.row}>
+          {renderDisabled("Go Live", "Live Stream", "radio-outline")}
+          {renderDisabled("Long Video", "Upload & Edit", "film-outline")}
+        </View>
+
+        {/* ======== SETTINGS ======== */}
+        <View style={styles.settingRow}>
+          <Text style={styles.settingText}>Monetization</Text>
+          <View style={styles.switchFake} />
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingText}>Enable Live Chat</Text>
+          <View style={styles.switchFake} />
+        </View>
+
+        <View style={styles.settingRow}>
+          <Text style={styles.settingText}>Schedule Post</Text>
+          <View style={styles.dateFake}>
+            <Text style={{ color: "#999" }}>Datetime Picker</Text>
+          </View>
+        </View>
+
+        {/* ===== RECENT DRAFTS ===== */}
+        <Text style={styles.sectionTitle}>Recent Drafts</Text>
+
+        <TouchableOpacity style={styles.draftRow}>
+          <Image
+            source={{
+              uri: "https://via.placeholder.com/80x80",
+            }}
+            style={styles.draftImage}
           />
-        </View>
-
-        {/* Media buttons */}
-        <View style={styles.mediaButtons}>
-          <TouchableOpacity onPress={pickMedia} style={styles.mediaButton}>
-            <Ionicons name="images-outline" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Gallery</Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={takeMedia} style={styles.mediaButton}>
-            <Ionicons name="camera-outline" size={20} color="#fff" />
-            <Text style={styles.buttonText}>Camera</Text>
-          </TouchableOpacity>
-        </View>
-
-        {/* Upload indicator */}
-        {uploading && (
-          <View style={styles.uploadingContainer}>
-            <ActivityIndicator size="large" color="#1DA1F2" />
-            <Text style={styles.uploadingText}>Posting...</Text>
+          <View>
+            <Text style={styles.draftTitle}>Podcast Intro - V2</Text>
+            <Text style={styles.draftSub}>2 days ago</Text>
           </View>
-        )}
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.draftRow}>
+          <Image
+            source={{
+              uri: "https://via.placeholder.com/80x80",
+            }}
+            style={styles.draftImage}
+          />
+          <View>
+            <Text style={styles.draftTitle}>Morning Routine Reel</Text>
+            <Text style={styles.draftSub}>6 days ago</Text>
+          </View>
+        </TouchableOpacity>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </View>
   );
 }
 
-// -------------------- Styles --------------------
+/* ============== DISABLED (NO CLICK) BLOCKS ============== */
+function renderDisabled(title, sub, icon) {
+  return (
+    <View style={[styles.block, { opacity: 0.3 }]}>
+      <View style={styles.iconBox}>
+        <Ionicons name={icon} size={30} color="#fff" />
+      </View>
+      <Text style={styles.mainTitle}>{title}</Text>
+      <Text style={styles.subTitle}>{sub}</Text>
+      <View style={styles.smallBtn}>
+        <Text style={styles.smallBtnText}>Coming Soon</Text>
+      </View>
+    </View>
+  );
+}
+
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#fff' },
+  container: { flex: 1, backgroundColor: "#000" },
+
   header: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: 12,
-    borderBottomWidth: 0.5,
-    borderColor: '#ddd',
-    paddingTop: Platform.OS === 'ios' ? 50 : 30,
+    position: "absolute",
+    top: Platform.OS === "ios" ? 50 : 20,
+    zIndex: 10,
+    width: "100%",
+    paddingHorizontal: 16,
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
   },
-  backButton: { padding: 5 },
-  shareButton: { fontSize: 16, fontWeight: 'bold', color: '#1DA1F2' },
-  shareButtonDisabled: { color: '#ccc' },
-  content: { padding: 16 },
-  inputWrapper: { borderBottomWidth: 0.5, borderColor: '#ddd', paddingBottom: 8 },
-  textInput: { fontSize: 16, minHeight: 80, color: '#000' },
-  mediaPreviewContainer: {
-    position: 'relative',
+  headerTitle: { color: "#fff", fontSize: 18, fontWeight: "600" },
+
+  row: {
+    flexDirection: "row",
+    gap: 12,
+    justifyContent: "center",
     marginBottom: 12,
+  },
+
+  block: {
+    width: "45%",
+    backgroundColor: "#111",
+    borderRadius: 16,
+    paddingVertical: 16,
+    alignItems: "center",
+  },
+
+  iconBox: {
+    backgroundColor: "#222",
+    padding: 14,
     borderRadius: 12,
-    overflow: 'hidden',
+    marginBottom: 6,
   },
-  mediaPreview: { width: '100%', height: 250, borderRadius: 12, backgroundColor: '#000' },
-  removeMediaButton: {
-    position: 'absolute',
-    top: 8,
-    right: 8,
-    backgroundColor: 'rgba(255,255,255,0.8)',
-    borderRadius: 15,
-    padding: 2,
+
+  mainTitle: { color: "#fff", fontSize: 18, fontWeight: "700" },
+  subTitle: { color: "#888", fontSize: 13 },
+
+  smallBtn: {
+    marginTop: 14,
+    backgroundColor: "#222",
+    borderRadius: 10,
+    paddingVertical: 8,
+    paddingHorizontal: 8,
   },
-  mediaButtons: { flexDirection: 'row', gap: 10, marginTop: 12 },
-  mediaButton: {
-    flex: 1,
-    backgroundColor: '#1DA1F2',
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'center',
-    gap: 8,
-    padding: 12,
+  smallBtnText: { color: "#fff", fontSize: 12 },
+
+  /* ===== Settings ===== */
+  settingRow: {
+    flexDirection: "row",
+    justifyContent: "space-between",
+    paddingHorizontal: 18,
+    paddingVertical: 10,
+  },
+  settingText: { color: "#fff", fontSize: 16 },
+  switchFake: {
+    width: 40,
+    height: 22,
+    backgroundColor: "#333",
+    borderRadius: 12,
+  },
+  dateFake: {
+    backgroundColor: "#222",
+    padding: 8,
     borderRadius: 10,
   },
-  buttonText: { color: '#fff', fontWeight: '600', fontSize: 14 },
-  uploadingContainer: { marginTop: 20, alignItems: 'center' },
-  uploadingText: { marginTop: 10, fontSize: 16, color: '#666' },
+
+  /* ===== Drafts ===== */
+  sectionTitle: {
+    color: "#fff",
+    marginLeft: 18,
+    marginTop: 14,
+    marginBottom: 6,
+    fontSize: 16,
+    fontWeight: "600",
+  },
+
+  draftRow: {
+    flexDirection: "row",
+    gap: 12,
+    paddingHorizontal: 18,
+    marginBottom: 12,
+    alignItems: "center",
+  },
+
+  draftImage: {
+    width: 70,
+    height: 70,
+    borderRadius: 10,
+  },
+
+  draftTitle: { color: "#fff", fontSize: 16, fontWeight: "600" },
+  draftSub: { color: "#888", fontSize: 12 },
 });
