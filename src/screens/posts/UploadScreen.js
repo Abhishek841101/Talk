@@ -34,7 +34,6 @@ export default function CreateScreen({ navigation }) {
               <Ionicons name="videocam-outline" size={30} color="#A45CFF" />
             </View>
             <Text style={styles.mainTitle}>Reel</Text>
-            {/* <Text style={styles.subTitle}>Short</Text> */}
 
             <View style={styles.smallBtn}>
               <Text style={styles.smallBtnText}>Record Short Video</Text>
@@ -50,7 +49,6 @@ export default function CreateScreen({ navigation }) {
               <Ionicons name="image-outline" size={30} color="#7DB9FF" />
             </View>
             <Text style={styles.mainTitle}>Post</Text>
-            {/* <Text style={styles.subTitle}>Upload</Text> */}
 
             <View style={styles.smallBtn}>
               <Text style={styles.smallBtnText}>Upload & Edit</Text>
@@ -61,7 +59,22 @@ export default function CreateScreen({ navigation }) {
         {/* ============== PODCAST ROW ============== */}
         <View style={styles.row}>
           {renderDisabled("Podcast", "Upload Audio/Video", "mic-outline")}
-          {renderDisabled("Record & Upload", "Record + Edit", "recording-outline")}
+
+          {/* ✅ Record & Upload → MediaCreateScreen */}
+          <TouchableOpacity
+            style={styles.block}
+            onPress={() => navigation.navigate("MediaCreateScreen")}
+          >
+            <View style={styles.iconBox}>
+              <Ionicons name="recording-outline" size={30} color="#A45CFF" />
+            </View>
+            <Text style={styles.mainTitle}>Record & Upload</Text>
+            <Text style={styles.subTitle}>Record + Edit</Text>
+
+            <View style={styles.smallBtn}>
+              <Text style={styles.smallBtnText}>Open Camera</Text>
+            </View>
+          </TouchableOpacity>
         </View>
 
         {/* ============== GO LIVE / LONG VIDEO ============== */}
@@ -93,9 +106,7 @@ export default function CreateScreen({ navigation }) {
 
         <TouchableOpacity style={styles.draftRow}>
           <Image
-            source={{
-              uri: "https://via.placeholder.com/80x80",
-            }}
+            source={{ uri: "https://via.placeholder.com/80x80" }}
             style={styles.draftImage}
           />
           <View>
@@ -106,9 +117,7 @@ export default function CreateScreen({ navigation }) {
 
         <TouchableOpacity style={styles.draftRow}>
           <Image
-            source={{
-              uri: "https://via.placeholder.com/80x80",
-            }}
+            source={{ uri: "https://via.placeholder.com/80x80" }}
             style={styles.draftImage}
           />
           <View>

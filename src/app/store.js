@@ -44,7 +44,7 @@ import notificationReducer from '../features/notifications/notificationSlice';
 // import callReducer from '../features/calls/callSlice';
 // import voiceNoteReducer from '../features/calls/voiceNoteSlice';
 // import socketReducer from '../features/calls/socketSlice';
-
+import mediaReducer from '../features/media/mediaSlice';
 
 
 const rootReducer = combineReducers({
@@ -55,6 +55,7 @@ const rootReducer = combineReducers({
   posts: postsReducer,
   reels: reelsReducer,
   notification: notificationReducer,
+  media: mediaReducer,
     // socket: socketReducer,
 });
 
