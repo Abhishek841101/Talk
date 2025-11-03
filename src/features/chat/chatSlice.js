@@ -40,6 +40,7 @@ export const fetchMessages = createAsyncThunk(
         receiver: String(msg.receiver),
         content: msg.content || msg.text || "",
         image: msg.image || null,
+        audio: msg.audio || null,
         timestamp: msg.timestamp || msg.createdAt || new Date().toISOString(),
         readBy: (msg.readBy || []).map(String),
         senderUsername: msg.senderUsername || msg.sender?.username || null,

@@ -1,406 +1,3 @@
-
-
-// import React, { useState, useRef, useEffect, useCallback } from "react";
-// import {
-//   View,
-//   Text,
-//   FlatList,
-//   TextInput,
-//   TouchableOpacity,
-//   StyleSheet,
-//   KeyboardAvoidingView,
-//   Platform,
-//   Image,
-//   PanResponder,
-//   AppState,
-// } from "react-native";
-
-// // ---- Vector icons (correct RN CLI import) ----
-// import Ionicons from 'react-native-vector-icons/Ionicons';
-// import MaterialIcons from 'react-native-vector-icons/MaterialIcons';
-// import Feather from 'react-native-vector-icons/Feather';
-
-// // ---- Native image picker ----
-// import { launchImageLibrary } from 'react-native-image-picker';
-
-// import { useDispatch, useSelector } from "react-redux";
-// import {
-//   fetchMessages,
-//   sendMessageOptimistic,
-//   newMessageReceived,
-//   sendMessageAcknowledged,
-//   markMessagesSeenLocal,
-//   updateUserStatus,
-// } from "../../features/chat/chatSlice";
-// import { initSocket, getSocket } from "../../lib/socket";
-// import { useFocusEffect } from "@react-navigation/native";
-
-// // ---------------- Reply Preview ----------------
-// const ReplyPreview = ({ reply, onCancel }) => {
-//   if (!reply) return null;
-//   return (
-//     <View style={styles.replyPreview}>
-//       <View style={{ flex: 1 }}>
-//         <Text style={styles.replyLabel}>Replying to {reply.senderName}</Text>
-//         <Text style={styles.replyText} numberOfLines={1}>
-//           {reply.content || "📷 Photo"}
-//         </Text>
-//       </View>
-//       <TouchableOpacity onPress={onCancel}>
-//         <Ionicons name="close" size={20} color="#555" />
-//       </TouchableOpacity>
-//     </View>
-//   );
-// };
-
-// export default function ChatScreen({ route, navigation }) {
-//   const { friendId, friendName, friendAvatar } = route.params;
-//   const dispatch = useDispatch();
-//   const { messages, allUsers } = useSelector((state) => state.chat);
-//   const currentUser = useSelector((state) => state.auth.user) || {};
-//   const flatListRef = useRef();
-//   const [input, setInput] = useState("");
-//   const [image, setImage] = useState(null);
-//   const [typing, setTyping] = useState(false);
-//   const [reply, setReply] = useState(null);
-//   const friendMessages = messages[friendId] || [];
-
-//   const friendStatus = allUsers.find((u) => String(u._id) === String(friendId));
-//   const isFriendOnline = friendStatus?.isOnline;
-
-//   const [isFocused, setIsFocused] = useState(true);
-//   useFocusEffect(
-//     useCallback(() => {
-//       setIsFocused(true);
-//       return () => setIsFocused(false);
-//     }, [])
-//   );
-
-//   // Fetch messages
-//   useEffect(() => {
-//     if (friendId) dispatch(fetchMessages(friendId));
-//   }, [friendId]);
-
-//   // Reconnect on app active
-//   useEffect(() => {
-//     const sub = AppState.addEventListener("change", async (state) => {
-//       if (state === "active") {
-//         const socket = await initSocket();
-//         if (!socket.connected) socket.connect();
-//       }
-//     });
-//     return () => sub.remove();
-//   }, []);
-
-//   // Setup socket
-//   useEffect(() => {
-//     let socket;
-
-//     const setup = async () => {
-//       socket = await initSocket();
-//       if (!socket) return;
-
-//       if (!socket.connected) socket.connect();
-
-//       socket.on("new-message", (data) => {
-//         if (!data) return;
-//         const { message, tempId } = data;
-//         const senderId = String(message.sender._id || message.sender);
-//         const receiverId = String(message.receiver);
-
-//         const isMe = senderId === String(currentUser._id);
-//         const relevant =
-//           senderId === String(friendId) || receiverId === String(friendId);
-
-//         if (!relevant) return;
-
-//         if (tempId) {
-//           dispatch(newMessageReceived({ friendId, message, tempId }));
-//         } else {
-//           dispatch(newMessageReceived({ friendId, message }));
-//         }
-
-//         if (!isMe && isFocused) {
-//           const unreadMsgIds = [message._id];
-//           dispatch(
-//             markMessagesSeenLocal({
-//               friendId,
-//               messageIds: unreadMsgIds,
-//               userId: currentUser._id,
-//             })
-//           );
-//           socket.emit("mark-seen", {
-//             friendId,
-//             messageIds: unreadMsgIds,
-//             userId: currentUser._id,
-//           });
-//         }
-//       });
-
-//       socket.on("message-sent", (ack) => {
-//         const { tempId, realId } = ack;
-//         dispatch(sendMessageAcknowledged({ friendId, tempId, realId }));
-//       });
-
-//       socket.on("messages-seen", ({ friendId: fId, messageIds, userId }) => {
-//         if (String(fId) === String(friendId)) {
-//           dispatch(markMessagesSeenLocal({ friendId: fId, messageIds, userId }));
-//         }
-//       });
-
-//       socket.on("typing", ({ from }) => {
-//         if (String(from) === String(friendId)) {
-//           setTyping(true);
-//           setTimeout(() => setTyping(false), 2000);
-//         }
-//       });
-
-//       socket.on("user-status", ({ userId, isOnline }) => {
-//         dispatch(updateUserStatus({ userId, isOnline }));
-//       });
-//     };
-
-//     setup();
-
-//     return () => {
-//       socket?.off("new-message");
-//       socket?.off("message-sent");
-//       socket?.off("messages-seen");
-//       socket?.off("typing");
-//       socket?.off("user-status");
-//     };
-//   }, [friendId, currentUser._id, isFocused, dispatch]);
-
-//   // Mark unseen as seen
-//   useEffect(() => {
-//     if (!friendMessages.length || !isFocused) return;
-//     const unseen = friendMessages.filter(
-//       (m) =>
-//         String(m.sender) === String(friendId) &&
-//         !(m.readBy || []).map(String).includes(String(currentUser._id))
-//     );
-
-//     if (unseen.length) {
-//       const ids = unseen.map((m) => m._id);
-//       dispatch(markMessagesSeenLocal({ friendId, messageIds: ids, userId: currentUser._id }));
-//       getSocket()?.emit("mark-seen", { friendId, messageIds: ids, userId: currentUser._id });
-//     }
-//   }, [friendMessages, isFocused]);
-
-//   // Send message
-//   const sendMessage = async () => {
-//     if (!input.trim() && !image) return;
-//     const socket = await initSocket();
-//     if (!socket) return;
-
-//     const tempId = `temp-${Date.now()}-${Math.random()}`;
-
-//     const tempMsg = {
-//       _id: tempId,
-//       sender: currentUser._id,
-//       senderName: "You",
-//       receiver: friendId,
-//       content: input,
-//       image,
-//       replyTo: reply,
-//       timestamp: new Date().toISOString(),
-//       readBy: [String(currentUser._id)],
-//     };
-
-//     dispatch(sendMessageOptimistic({ friendId, message: tempMsg }));
-//     setInput("");
-//     setImage(null);
-//     setReply(null);
-
-//     socket.emit("send-message", {
-//       receiver: friendId,
-//       content: tempMsg.content,
-//       image: tempMsg.image,
-//       tempId,
-//       replyTo: reply,
-//     });
-//   };
-
-//   // Pick image
-//   const pickImage = () => {
-//     launchImageLibrary(
-//       { mediaType: "photo", quality: 0.7 },
-//       (response) => {
-//         if (!response.didCancel && response.assets?.[0]?.uri) {
-//           setImage(response.assets[0].uri);
-//         }
-//       }
-//     );
-//   };
-
-//   // Render message
-//   const renderMessage = ({ item, index }) => {
-//     const isMe = String(item.sender) === String(currentUser._id);
-//     const seenByFriend = (item.readBy || []).includes(friendId);
-//     const panResponder = PanResponder.create({
-//       onMoveShouldSetPanResponder: (_, g) => g.dx > 20,
-//       onPanResponderRelease: () => setReply(item),
-//     });
-
-//     return (
-//       <View
-//         {...panResponder.panHandlers}
-//         style={[
-//           styles.message,
-//           isMe ? styles.myMessage : styles.friendMessage,
-//           { shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 2, elevation: 2 },
-//         ]}
-//       >
-//         {item.replyTo && (
-//           <View style={styles.quoted}>
-//             <Text style={styles.quotedLabel}>{item.replyTo.senderName}</Text>
-//             <Text style={styles.quotedText} numberOfLines={1}>
-//               {item.replyTo.content || "📷 Photo"}
-//             </Text>
-//           </View>
-//         )}
-//         {item.image && <Image source={{ uri: item.image }} style={styles.image} />}
-//         {item.content && <Text style={{ color: isMe ? "#fff" : "#000", fontSize: 15 }}>{item.content}</Text>}
-
-//         <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 4 }}>
-//           <Text style={{ fontSize: 10, color: isMe ? "#ddd" : "#666" }}>
-//             {new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
-//           </Text>
-//           {isMe && index === 0 && (
-//             <Text style={{ fontSize: 10, color: "#888", marginLeft: 4 }}>
-//               {seenByFriend ? "Seen" : "Sent"}
-//             </Text>
-//           )}
-//         </View>
-//       </View>
-//     );
-//   };
-
-//   const sortedMessages = [...friendMessages].sort(
-//     (a, b) => new Date(b.timestamp) - new Date(a.timestamp)
-//   );
-
-//   return (
-//     <KeyboardAvoidingView
-//       style={styles.container}
-//       behavior={Platform.OS === "ios" ? "padding" : "height"}
-//       keyboardVerticalOffset={Platform.OS === "ios" ? 90 : 0}
-//     >
-//       <View style={styles.header}>
-//         <TouchableOpacity onPress={() => navigation.goBack()}>
-//           <Ionicons name="arrow-back" size={28} color="black" />
-//         </TouchableOpacity>
-//         <View>
-//           <Image source={{ uri: friendAvatar }} style={styles.avatar} />
-//           <View
-//             style={[
-//               styles.onlineDot,
-//               { backgroundColor: isFriendOnline ? "green" : "red" },
-//             ]}
-//           />
-//         </View>
-//         <View style={{ flex: 1, marginLeft: 8 }}>
-//           <Text style={styles.headerTitle}>{friendName}</Text>
-//           <Text style={{ fontSize: 12, color: isFriendOnline ? "green" : "#888" }}>
-//             {typing ? "Typing…" : isFriendOnline ? "Online" : "Offline"}
-//           </Text>
-//         </View>
-//         <Ionicons name="call-outline" size={24} style={styles.headerIcon} />
-//         <Ionicons name="videocam-outline" size={24} style={styles.headerIcon} />
-//         <Feather name="more-vertical" size={22} style={styles.headerIcon} />
-//       </View>
-
-//       <FlatList
-//         ref={flatListRef}
-//         data={sortedMessages}
-//         keyExtractor={(item) => item._id.toString()}
-//         renderItem={renderMessage}
-//         contentContainerStyle={{ padding: 16, paddingTop: 50 }}
-//         inverted
-//       />
-
-//       <ReplyPreview reply={reply} onCancel={() => setReply(null)} />
-
-//       <View style={styles.inputWrapper}>
-//         <Ionicons name="happy-outline" size={26} color="#555" />
-//         <TouchableOpacity onPress={pickImage}>
-//           <Ionicons name="image-outline" size={26} color="#555" style={{ marginLeft: 6 }} />
-//         </TouchableOpacity>
-//         <TextInput
-//           style={styles.input}
-//           value={input}
-//           onChangeText={(text) => {
-//             setInput(text);
-//             getSocket()?.emit("typing", { to: friendId });
-//           }}
-//           placeholder="Message..."
-//           placeholderTextColor="#888"
-//         />
-//         <TouchableOpacity>
-//           <MaterialIcons name="keyboard-voice" size={26} color="#555" />
-//         </TouchableOpacity>
-//         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
-//           <Ionicons name="send" size={20} color="#fff" />
-//         </TouchableOpacity>
-//       </View>
-//     </KeyboardAvoidingView>
-//   );
-// }
-
-// const styles = StyleSheet.create({
-//   container: { flex: 1, backgroundColor: "#fff" },
-//   header: { flexDirection: "row", alignItems: "center", padding: 20, backgroundColor: "#f7f7f7" },
-//   headerTitle: { fontSize: 16, fontWeight: "bold" },
-//   headerIcon: { marginLeft: 12 },
-//   avatar: { width: 40, height: 40, borderRadius: 20 },
-//   onlineDot: {
-//     width: 12,
-//     height: 12,
-//     borderRadius: 6,
-//     position: "absolute",
-//     bottom: 0,
-//     right: 0,
-//     borderWidth: 2,
-//     borderColor: "#fff",
-//   },
-//   message: { marginVertical: 4, padding: 10, borderRadius: 8, maxWidth: "80%" },
-//   myMessage: { backgroundColor: "#0078fe", alignSelf: "flex-end" },
-//   friendMessage: { backgroundColor: "#eee", alignSelf: "flex-start" },
-//   quoted: { padding: 6, backgroundColor: "#ccc", borderRadius: 6, marginBottom: 4 },
-//   quotedLabel: { fontSize: 10, fontWeight: "bold" },
-//   quotedText: { fontSize: 12 },
-//   image: { width: 150, height: 150, borderRadius: 8, marginBottom: 4 },
-//   inputWrapper: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     padding: 5,
-//     borderTopWidth: 1,
-//     borderColor: "#ddd",
-//     backgroundColor: "#fff",
-//   },
-//   input: { flex: 1, marginHorizontal: 8, fontSize: 16, color: "#000" },
-//   sendButton: {
-//     backgroundColor: "#0078fe",
-//     padding: 12,
-//     borderRadius: 20,
-//     justifyContent: "center",
-//     alignItems: "center",
-//   },
-//   replyPreview: {
-//     flexDirection: "row",
-//     alignItems: "center",
-//     backgroundColor: "#f0f0f0",
-//     padding: 6,
-//     borderLeftWidth: 4,
-//     borderLeftColor: "#0078fe",
-//   },
-//   replyLabel: { fontSize: 12, fontWeight: "bold", color: "#555" },
-//   replyText: { fontSize: 14, color: "#333" },
-// });
-
-
-
-
 import React, { useState, useRef, useEffect, useCallback } from "react";
 import {
   View,
@@ -420,7 +17,7 @@ import {
 import Ionicons from "react-native-vector-icons/Ionicons";
 import MaterialIcons from "react-native-vector-icons/MaterialIcons";
 import Feather from "react-native-vector-icons/Feather";
-import { launchImageLibrary } from "react-native-image-picker";
+import { launchCamera, launchImageLibrary } from "react-native-image-picker";
 import { useDispatch, useSelector } from "react-redux";
 import {
   fetchMessages,
@@ -675,6 +272,20 @@ export default function ChatScreen({ route, navigation }) {
     });
   };
 
+  // ---------------- Take Photo ----------------
+  const takePhoto = async () => {
+    const options = { mediaType: "photo", quality: 0.7 };
+    launchCamera(options, (response) => {
+      if (response.didCancel) return;
+      if (response.errorCode) {
+        console.log("Camera error:", response.errorMessage);
+      } else {
+        const uri = response.assets?.[0]?.uri;
+        if (uri) setImage(uri);
+      }
+    });
+  };
+
   // ---------------- Selection & Long Press ----------------
   const handleLongPress = (msg) => setSelectedMessages([msg]);
   const toggleSelect = (msg) => {
@@ -738,7 +349,10 @@ export default function ChatScreen({ route, navigation }) {
         )}
         <View style={{ flexDirection: "row", justifyContent: "flex-end", marginTop: 4 }}>
           <Text style={{ fontSize: 10, color: isMe ? "#ddd" : "#666" }}>
-            {new Date(item.timestamp).toLocaleTimeString([], { hour: "2-digit", minute: "2-digit" })}
+            {new Date(item.timestamp).toLocaleTimeString([], {
+              hour: "2-digit",
+              minute: "2-digit",
+            })}
           </Text>
           {isMe && index === 0 && (
             <Text style={{ fontSize: 10, color: "#888", marginLeft: 4 }}>
@@ -847,11 +461,14 @@ export default function ChatScreen({ route, navigation }) {
       {/* Reply Preview */}
       <ReplyPreview reply={reply} onCancel={() => setReply(null)} />
 
-      {/* Input */}
+      {/* Input Section */}
       <View style={styles.inputWrapper}>
         <Ionicons name="happy-outline" size={26} color="#555" />
         <TouchableOpacity onPress={pickImage}>
           <Ionicons name="image-outline" size={26} color="#555" style={{ marginLeft: 6 }} />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={takePhoto}>
+          <Ionicons name="camera-outline" size={26} color="#555" style={{ marginLeft: 6 }} />
         </TouchableOpacity>
         <TextInput
           style={styles.input}
@@ -863,9 +480,6 @@ export default function ChatScreen({ route, navigation }) {
           placeholder="Message..."
           placeholderTextColor="#888"
         />
-        <TouchableOpacity>
-          <MaterialIcons name="keyboard-voice" size={26} color="#555" />
-        </TouchableOpacity>
         <TouchableOpacity onPress={sendMessage} style={styles.sendButton}>
           <Ionicons name="send" size={20} color="#fff" />
         </TouchableOpacity>
@@ -898,7 +512,6 @@ export default function ChatScreen({ route, navigation }) {
         </View>
       </Modal>
 
-      {/* Chat Settings */}
       <ChatSettings
         visible={settingsVisible}
         onClose={() => setSettingsVisible(false)}
